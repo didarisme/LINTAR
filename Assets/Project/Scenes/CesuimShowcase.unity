@@ -276,8 +276,8 @@ Camera:
   near clip plane: 1
   far clip plane: 100000
   field of view: 60
-  orthographic: 0
-  orthographic size: 5
+  orthographic: 1
+  orthographic size: 1000
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -301,13 +301,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0, y: 1, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!1 &1240250064
 GameObject:
   m_ObjectHideFlags: 0
@@ -355,13 +355,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _ellipsoidOverride: {fileID: 0}
   _originPlacement: 1
-  _originAuthority: 1
-  _latitude: 45.982801988601686
+  _originAuthority: 0
+  _latitude: 45.98
   _longitude: 8.604655928270832
   _height: 1225.3287634233518
-  _ecefX: 4390564.644977981
-  _ecefY: 664375.4206479324
-  _ecefZ: 4564800.612513588
+  _ecefX: 4390786.130315636
+  _ecefY: 664408.9355660058
+  _ecefZ: 4564584.151180575
   _scale: 1
 --- !u!4 &1240250067
 Transform:
@@ -504,8 +504,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1480055989}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.00007134427, y: 0.0001172161, z: 0.000088243694, w: 1}
-  m_LocalPosition: {x: -1127.898, y: -225.38239, z: -907.9656}
+  m_LocalRotation: {x: -0.00004689231, y: 0.000117213945, z: 0.00008824656, w: 1}
+  m_LocalPosition: {x: -1127.898, y: -225.3454, z: -596.47296}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -684,7 +684,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1484037374
 Transform:
   m_ObjectHideFlags: 0
