@@ -8,33 +8,33 @@ using UnityEngine;
 
 public class FireSimLoader : MonoBehaviour
 {
-    [Header("File Settings")]
+    [Header("File")]
     [SerializeField] private string fileName = "fire_run.txt";
 
     [Header("Cesium")]
     [SerializeField] private CesiumGeoreference geoRef;
 
-    [Header("Visual Settings")]
-    [SerializeField] private float cubeSize = 10f;
+    [Header("Rendering")]
+    [SerializeField] private Mesh cubeMesh;
+    [SerializeField] private Material instancedMaterial;
+    [SerializeField] private float cubeSize = 8f;
     [SerializeField] private float tickDuration = 0.05f;
+    [SerializeField] private float raycastHeight = 500f;
 
-    private Dictionary<int, List<Vector2Int>> fireData = new Dictionary<int, List<Vector2Int>>();
-    private GameObject fireParent;
+    private Dictionary<int, List<Vector2Int>> fireData = new();
+    private List<Matrix4x4> matrices = new();
 
-    // WORLD data
     private int minPx, maxPx, minPy, maxPy;
-    private float patchWidthMeters;
-    private float patchHeightMeters;
-    private float centerPx;
-    private float centerPy;
+    private float patchWidthMeters, patchHeightMeters;
+    private float centerPx, centerPy;
+    private double centerLon, centerLat;
 
-    private double centerLon;
-    private double centerLat;
+    private GameObject fireAnchorObject;
 
     private void Awake()
     {
         LoadFile();
-        CreateFireParent();
+        CreateAnchor();
     }
 
     public void StartSimulation()
@@ -42,117 +42,122 @@ public class FireSimLoader : MonoBehaviour
         StartCoroutine(PlayFire());
     }
 
+    private void Update()
+    {
+        RenderInstances();
+    }
+
     private void LoadFile()
     {
         string path = Path.Combine(Application.dataPath, fileName);
-
-        if (!File.Exists(path))
-        {
-            Debug.LogError("File not found: " + path);
-            return;
-        }
-
         string[] lines = File.ReadAllLines(path);
 
         foreach (string line in lines)
         {
             if (line.StartsWith("WORLD"))
             {
-                string[] parts = line.Split(' ');
+                string[] p = line.Split(' ');
 
-                minPx = int.Parse(parts[1]);
-                maxPx = int.Parse(parts[2]);
-                minPy = int.Parse(parts[3]);
-                maxPy = int.Parse(parts[4]);
+                minPx = int.Parse(p[1]);
+                maxPx = int.Parse(p[2]);
+                minPy = int.Parse(p[3]);
+                maxPy = int.Parse(p[4]);
 
-                centerLon = double.Parse(parts[5], CultureInfo.InvariantCulture);
-                centerLat = double.Parse(parts[6], CultureInfo.InvariantCulture);
+                centerLon = double.Parse(p[5], CultureInfo.InvariantCulture);
+                centerLat = double.Parse(p[6], CultureInfo.InvariantCulture);
 
-                patchWidthMeters = float.Parse(parts[7], CultureInfo.InvariantCulture);
-                patchHeightMeters = float.Parse(parts[8], CultureInfo.InvariantCulture);
+                patchWidthMeters = float.Parse(p[7], CultureInfo.InvariantCulture);
+                patchHeightMeters = float.Parse(p[8], CultureInfo.InvariantCulture);
 
                 centerPx = (minPx + maxPx) / 2f;
                 centerPy = (minPy + maxPy) / 2f;
-
                 continue;
             }
 
             string clean = line.Replace("[", "").Replace("]", "");
-            string[] partsLine = clean.Split(' ');
+            string[] parts = clean.Split(' ');
 
-            if (partsLine.Length != 3)
-                continue;
+            if (parts.Length != 3) continue;
 
-            int tick = int.Parse(partsLine[0]);
-            int x = int.Parse(partsLine[1]);
-            int y = int.Parse(partsLine[2]);
+            int tick = int.Parse(parts[0]);
+            int x = int.Parse(parts[1]);
+            int y = int.Parse(parts[2]);
 
             if (!fireData.ContainsKey(tick))
                 fireData[tick] = new List<Vector2Int>();
 
             fireData[tick].Add(new Vector2Int(x, y));
         }
-
-        Debug.Log("Fire data loaded.");
-
-        float totalWidth = (maxPx - minPx) * patchWidthMeters;
-        float totalHeight = (maxPy - minPy) * patchHeightMeters;
-
-        Debug.Log("World width meters: " + totalWidth);
-        Debug.Log("World height meters: " + totalHeight);
     }
 
-    private void CreateFireParent()
+    private void CreateAnchor()
     {
-        if (geoRef == null)
-        {
+        if (!geoRef)
             geoRef = FindObjectOfType<CesiumGeoreference>();
-        }
 
-        fireParent = new GameObject("FireHandler");
-        fireParent.transform.SetParent(geoRef.transform, false);
+        fireAnchorObject = new GameObject("FireAnchor");
+        fireAnchorObject.transform.SetParent(geoRef.transform, false);
 
-        var anchor = fireParent.AddComponent<CesiumGlobeAnchor>();
-        anchor.longitudeLatitudeHeight = new double3(centerLon, centerLat, 1000f);
-
-        Debug.Log($"FireHandler centered at Lon:{centerLon}, Lat:{centerLat}");
+        var anchor = fireAnchorObject.AddComponent<CesiumGlobeAnchor>();
+        anchor.longitudeLatitudeHeight = new double3(centerLon, centerLat, 600f);
     }
 
     private IEnumerator PlayFire()
     {
         int maxTick = 0;
+        foreach (var t in fireData.Keys)
+            if (t > maxTick) maxTick = t;
 
-        foreach (int tick in fireData.Keys)
+        for (int tick = 0; tick <= maxTick; tick++)
         {
-            if (tick > maxTick)
-                maxTick = tick;
-        }
-
-        for (int currentTick = 0; currentTick <= maxTick; currentTick++)
-        {
-            if (fireData.ContainsKey(currentTick))
+            if (fireData.ContainsKey(tick))
             {
-                foreach (Vector2Int pos in fireData[currentTick])
-                {
-                    CreateCube(pos.x, pos.y);
-                }
+                foreach (var pos in fireData[tick])
+                    AddInstance(pos.x, pos.y);
             }
 
             yield return new WaitForSeconds(tickDuration);
         }
-
-        Debug.Log("Playback finished.");
     }
 
-    private void CreateCube(int px, int py)
+    private void AddInstance(int px, int py)
     {
         float localX = (px - centerPx) * patchWidthMeters;
         float localZ = (py - centerPy) * patchHeightMeters;
 
-        GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        Vector3 worldPos = fireAnchorObject.transform.TransformPoint(
+            new Vector3(localX, raycastHeight, localZ)
+        );
 
-        cube.transform.SetParent(fireParent.transform, false);
-        cube.transform.localPosition = new Vector3(localX, 0, localZ);
-        cube.transform.localScale = Vector3.one * cubeSize;
+        if (Physics.Raycast(worldPos, Vector3.down, out RaycastHit hit, raycastHeight * 2))
+        {
+            Vector3 finalPos = hit.point;
+
+            Matrix4x4 matrix = Matrix4x4.TRS(
+                finalPos,
+                Quaternion.identity,
+                Vector3.one * cubeSize
+            );
+
+            matrices.Add(matrix);
+        }
+    }
+
+    private void RenderInstances()
+    {
+        if (cubeMesh == null || instancedMaterial == null) return;
+
+        const int batchSize = 1023;
+
+        for (int i = 0; i < matrices.Count; i += batchSize)
+        {
+            int count = Mathf.Min(batchSize, matrices.Count - i);
+            Graphics.DrawMeshInstanced(
+                cubeMesh,
+                0,
+                instancedMaterial,
+                matrices.GetRange(i, count)
+            );
+        }
     }
 }
