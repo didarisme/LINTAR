@@ -1,9 +1,12 @@
+using TMPro;
 using UnityEngine;
 
 public class CameraSwitcher : MonoBehaviour
 {
     [SerializeField] private ViewCamera[] cameras;
+    [SerializeField] private TextMeshProUGUI cameraText;
 
+    private Camera activeCamera;
     private int currentIndex = 0;
 
     private void Start()
@@ -32,26 +35,25 @@ public class CameraSwitcher : MonoBehaviour
 
     public void PreviousCamera()
     {
-        currentIndex--;
-
-        if (currentIndex < 0)
-            currentIndex = cameras.Length - 1;
-
+        currentIndex = (currentIndex - 1 + cameras.Length) % cameras.Length;
         ActivateCamera(currentIndex);
     }
 
     public void ActivateCamera(int cameraIndex)
     {
-        for (int i = 0; i < cameras.Length; i++)
-        {
-            cameras[i].camera.enabled = i == cameraIndex;
-        }
+        if (activeCamera != null)
+            activeCamera.enabled = false;
+
+        activeCamera = cameras[cameraIndex].viewCamera;
+        activeCamera.enabled = true;
+
+        cameraText.text = cameras[cameraIndex].cameraName;
     }
 
     [System.Serializable]
     private class ViewCamera
     {
         public string cameraName;
-        public Camera camera;
+        public Camera viewCamera;
     }
 }
