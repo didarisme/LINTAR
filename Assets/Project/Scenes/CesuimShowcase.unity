@@ -2777,8 +2777,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1407807001}
-        m_TargetAssemblyTypeName: FireSimLoader, Assembly-CSharp
+      - m_Target: {fileID: 1407807002}
+        m_TargetAssemblyTypeName: FireSimulation, Assembly-CSharp
         m_MethodName: StartSimulation
         m_Mode: 1
         m_Arguments:
@@ -3288,8 +3288,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1407807000}
   - component: {fileID: 1407807001}
+  - component: {fileID: 1407807002}
   m_Layer: 0
-  m_Name: FireSimLoader
+  m_Name: FireSimLogic
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3322,11 +3323,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3995c8fbf13092744a5cb5036c5f1490, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fileName: fire_run.txt
+  fireFile: {fileID: 4900000, guid: 405fdc08c3fa4b04a97c8e80dea8580c, type: 3}
+--- !u!114 &1407807002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1407806999}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 73e1b9175466cea4b8d2ec4e29c31473, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loader: {fileID: 1407807001}
   geoRef: {fileID: 1338935445}
   cubeMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   instancedMaterial: {fileID: 2100000, guid: 0983da5ca2a1a6945b1024bb1e270090, type: 2}
-  cubeSize: 10
+  cubeSize: 15
   tickDuration: 0.05
   raycastHeight: 500
 --- !u!1 &1420292288
