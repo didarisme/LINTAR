@@ -619,8 +619,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 290481424}
   serializedVersion: 2
-  m_LocalRotation: {x: -1.3877788e-17, y: -4.6252578e-17, z: 1.5483733e-18, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -1.3877788e-17, y: -6.938894e-18, z: 0, w: 1}
+  m_LocalPosition: {x: 5.820766e-10, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -654,9 +654,9 @@ MonoBehaviour:
   _detectTransformChanges: 1
   _localToGlobeFixedMatrix:
     c0:
-      x: -0.14952909638705056
+      x: -0.1495290963870505
       y: 0.9887573258053122
-      z: 0.00000000000000006651952145543198
+      z: 0
       w: 0
     c1:
       x: 0.687206741051145
@@ -665,12 +665,12 @@ MonoBehaviour:
       w: 0
     c2:
       x: -0.7109064244944878
-      y: -0.10750989398114523
+      y: -0.10750989398114515
       z: 0.6950206315704781
       w: 0
     c3:
       x: 4391116.391781312
-      y: 664065.5386888236
+      y: 664065.5386888242
       z: 4563448.514953309
       w: 1
   _localToGlobeFixedMatrixIsValid: 1
@@ -975,6 +975,7 @@ GameObject:
   - component: {fileID: 344636310}
   - component: {fileID: 344636311}
   - component: {fileID: 344636312}
+  - component: {fileID: 344636313}
   m_Layer: 0
   m_Name: Fly View
   m_TagString: MainCamera
@@ -1092,6 +1093,28 @@ MonoBehaviour:
     m_MipBias: 0
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
+--- !u!114 &344636313
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 344636309}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b8fd62a28809d4042a5f52f5bd7e82c6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveSpeed: 35
+  speedChangeStep: 2
+  minSpeed: 1
+  maxSpeed: 150
+  moveUpKey: 101
+  moveDownKey: 113
+  resetKey: 114
+  mouseSensitivity: 3
+  minPitch: -80
+  maxPitch: 80
 --- !u!1 &361143915
 GameObject:
   m_ObjectHideFlags: 0
@@ -1359,6 +1382,52 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 484709141}
   m_CullTransparentMesh: 1
+--- !u!1 &540850456
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 540850457}
+  - component: {fileID: 540850458}
+  m_Layer: 0
+  m_Name: FirePool
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &540850457
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540850456}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 867282091}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &540850458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 540850456}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 193ba380c177a9b489624b0ffdd37425, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  firePrefab: {fileID: 5445406703297087811, guid: 5337d1ac551923342b9abaebcc12eab8, type: 3}
+  initialSize: 2000
 --- !u!1 &586398224
 GameObject:
   m_ObjectHideFlags: 0
@@ -2147,6 +2216,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1407807000}
+  - {fileID: 540850457}
   - {fileID: 344094325}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -3210,7 +3280,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _useMainCamera: 1
-  _useSceneViewCameraInEditor: 0
+  _useSceneViewCameraInEditor: 1
   _additionalCameras:
   - {fileID: 1539718292}
 --- !u!1 &1354919532
@@ -3323,7 +3393,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3995c8fbf13092744a5cb5036c5f1490, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fireFile: {fileID: 4900000, guid: 405fdc08c3fa4b04a97c8e80dea8580c, type: 3}
+  fireFile: {fileID: 4900000, guid: 4cbb48634d22f7b499376eb81046422a, type: 3}
 --- !u!114 &1407807002
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3338,10 +3408,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loader: {fileID: 1407807001}
   geoRef: {fileID: 1338935445}
+  firePool: {fileID: 540850458}
   cubeMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   instancedMaterial: {fileID: 2100000, guid: 0983da5ca2a1a6945b1024bb1e270090, type: 2}
-  cubeSize: 15
-  tickDuration: 0.05
+  cubeSize: 18
+  tickDuration: 0.3
+  fireLifetimeTicks: 10
   raycastHeight: 500
 --- !u!1 &1420292288
 GameObject:

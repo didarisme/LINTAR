@@ -8,12 +8,16 @@ public class FireSimulation : MonoBehaviour
     [Header("References")]
     [SerializeField] private FireSimLoader loader;
     [SerializeField] private CesiumGeoreference geoRef;
+    [SerializeField] private FirePool firePool;
 
     [Header("Rendering")]
     [SerializeField] private Mesh cubeMesh;
     [SerializeField] private Material instancedMaterial;
     [SerializeField] private float cubeSize = 8f;
+
+    [Header("Simulation")]
     [SerializeField] private float tickDuration = 0.05f;
+    [SerializeField] private int fireLifetimeTicks = 20;
     [SerializeField] private float raycastHeight = 500f;
 
     private FireSimConfig config;
@@ -22,7 +26,12 @@ public class FireSimulation : MonoBehaviour
     private readonly List<Matrix4x4> matrices = new();
     private readonly List<Matrix4x4> batch = new(1023);
 
-    private void Awake()
+    private readonly Dictionary<Vector2Int, FireInstance> activeFires = new();
+    private readonly Dictionary<Vector2Int, Vector3> cachedGroundPositions = new();
+
+    private int currentTick;
+
+    private void OnEnable()
     {
         if (loader == null)
         {
@@ -33,21 +42,20 @@ public class FireSimulation : MonoBehaviour
         loader.OnDataLoaded += HandleDataLoaded;
     }
 
-    private void Update()
-    {
-        RenderInstances();
-    }
-
-    private void OnDestroy()
+    private void OnDisable()
     {
         if (loader != null)
             loader.OnDataLoaded -= HandleDataLoaded;
     }
 
+    private void Update()
+    {
+        RenderInstances();
+    }
+
     private void HandleDataLoaded(FireSimConfig newConfig)
     {
         config = newConfig;
-
         CreateAnchor();
     }
 
@@ -68,16 +76,19 @@ public class FireSimulation : MonoBehaviour
     private IEnumerator PlayFire()
     {
         int maxTick = 0;
+
         foreach (var t in config.FireData.Keys)
             if (t > maxTick) maxTick = t;
 
-        for (int tick = 0; tick <= maxTick; tick++)
+        for (currentTick = 0; currentTick <= maxTick; currentTick++)
         {
-            if (config.FireData.TryGetValue(tick, out var positions))
+            if (config.FireData.TryGetValue(currentTick, out var positions))
             {
                 foreach (var pos in positions)
-                    AddInstance(pos.x, pos.y);
+                    SpawnFire(pos.x, pos.y);
             }
+
+            UpdateFireLifecycle();
 
             yield return new WaitForSeconds(tickDuration);
         }
@@ -85,8 +96,63 @@ public class FireSimulation : MonoBehaviour
         Debug.Log("Simulation finished");
     }
 
-    private void AddInstance(int px, int py)
+    private void SpawnFire(int px, int py)
     {
+        Vector2Int key = new(px, py);
+
+        if (activeFires.ContainsKey(key))
+            return;
+
+        Vector3 groundPos = GetGroundPosition(px, py);
+
+        GameObject fire = firePool.Get();
+        fire.transform.position = groundPos;
+        fire.transform.SetParent(fireAnchorObject.transform);
+        fire.SetActive(true);
+
+        activeFires[key] = new FireInstance
+        {
+            vfx = fire,
+            startTick = currentTick,
+            position = groundPos
+        };
+    }
+
+    private void UpdateFireLifecycle()
+    {
+        List<Vector2Int> toRemove = new();
+
+        foreach (var pair in activeFires)
+        {
+            FireInstance fire = pair.Value;
+
+            if (currentTick - fire.startTick >= fireLifetimeTicks)
+            {
+                firePool.Release(fire.vfx);
+
+                Matrix4x4 matrix = Matrix4x4.TRS(
+                    fire.position,
+                    Quaternion.identity,
+                    Vector3.one * cubeSize
+                );
+
+                matrices.Add(matrix);
+
+                toRemove.Add(pair.Key);
+            }
+        }
+
+        foreach (var key in toRemove)
+            activeFires.Remove(key);
+    }
+
+    private Vector3 GetGroundPosition(int px, int py)
+    {
+        Vector2Int key = new(px, py);
+
+        if (cachedGroundPositions.TryGetValue(key, out var pos))
+            return pos;
+
         float localX = (px - config.CenterPx) * config.PatchWidthMeters;
         float localZ = (py - config.CenterPy) * config.PatchHeightMeters;
 
@@ -96,14 +162,12 @@ public class FireSimulation : MonoBehaviour
 
         if (Physics.Raycast(worldPos, Vector3.down, out RaycastHit hit, raycastHeight * 2))
         {
-            Matrix4x4 matrix = Matrix4x4.TRS(
-                hit.point,
-                Quaternion.identity,
-                Vector3.one * cubeSize
-            );
-
-            matrices.Add(matrix);
+            cachedGroundPositions[key] = hit.point;
+            return hit.point;
         }
+
+        cachedGroundPositions[key] = worldPos;
+        return worldPos;
     }
 
     private void RenderInstances()
@@ -117,6 +181,7 @@ public class FireSimulation : MonoBehaviour
             int count = Mathf.Min(batchSize, matrices.Count - i);
 
             batch.Clear();
+
             for (int j = 0; j < count; j++)
                 batch.Add(matrices[i + j]);
 
@@ -127,5 +192,12 @@ public class FireSimulation : MonoBehaviour
                 batch
             );
         }
+    }
+
+    private class FireInstance
+    {
+        public GameObject vfx;
+        public int startTick;
+        public Vector3 position;
     }
 }

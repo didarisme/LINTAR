@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.IO;
 using Unity.Mathematics;
 using UnityEngine;
 
@@ -12,7 +11,7 @@ public class FireSimLoader : MonoBehaviour
 
     public event Action<FireSimConfig> OnDataLoaded;
 
-    private void Awake()
+    private void Start()
     {
         LoadFile();
     }
