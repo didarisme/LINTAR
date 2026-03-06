@@ -2,17 +2,20 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class SimulationLoader : MonoBehaviour
 {
+    [SerializeField] private FireScenarioSelectionSO fireScenario;
+
     [Header("References")]
     public Transform contentParent;
     public GameObject simButtonPrefab;
     public Button continueButton;
 
     [Header("Colors")]
-    public Color normalColor   = new Color(0.12f, 0.12f, 0.16f); 
-    public Color selectedColor = new Color(0.25f, 0.35f, 0.7f); 
+    public Color normalColor = new Color(0.12f, 0.12f, 0.16f);
+    public Color selectedColor = new Color(0.25f, 0.35f, 0.7f);
 
     private string selectedFilePath = null;
     private GameObject selectedButton = null;
@@ -65,27 +68,27 @@ public class SimulationLoader : MonoBehaviour
 
         continueButton.interactable = true;
     }
-/*
+    /*
+        void OnContinuePressed()
+        {
+            if (selectedFilePath == null) return;
+
+            SimulationData.filePath = selectedFilePath;
+            SimulationData.content  = File.ReadAllText(selectedFilePath);
+
+            UnityEngine.SceneManagement.SceneManager.LoadScene("SimulationScene");
+        }  */
+
+    //Delete after tests and uncomment upper func
     void OnContinuePressed()
     {
         if (selectedFilePath == null) return;
 
-        SimulationData.filePath = selectedFilePath;
-        SimulationData.content  = File.ReadAllText(selectedFilePath);
+        string content = File.ReadAllText(selectedFilePath);
 
-        UnityEngine.SceneManagement.SceneManager.LoadScene("SimulationScene");
-    }  */
+        // создаём временный TextAsset
+        fireScenario.SelectedScenario = new TextAsset(content);
 
-    //Delete after tests and uncomment upper func
-    void OnContinuePressed()
-{
-    if (selectedFilePath == null) return;
-
-    SimulationData.filePath = selectedFilePath;
-    SimulationData.content  = File.ReadAllText(selectedFilePath);
-
-    
-    Debug.Log("Выбрана симуляция: " + selectedFilePath);
-}
-
+        SceneManager.LoadScene("CesuimShowcase");
+    }
 }

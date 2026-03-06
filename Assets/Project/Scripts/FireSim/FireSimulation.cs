@@ -11,9 +11,9 @@ public class FireSimulation : MonoBehaviour
     [SerializeField] private FirePool firePool;
 
     [Header("Rendering")]
-    [SerializeField] private Mesh cubeMesh;
+    [SerializeField] private Mesh instancedMesh;
     [SerializeField] private Material instancedMaterial;
-    [SerializeField] private float cubeSize = 8f;
+    [SerializeField] private float meshSize = 8f;
 
     [Header("Simulation")]
     [SerializeField] private float tickDuration = 0.05f;
@@ -30,6 +30,17 @@ public class FireSimulation : MonoBehaviour
     private readonly Dictionary<Vector2Int, Vector3> cachedGroundPositions = new();
 
     private int currentTick;
+
+    public float FireSpeed
+    {
+        get
+        {
+            float t = Mathf.InverseLerp(10f, 0.05f, tickDuration);
+            return Mathf.Lerp(1f, 10f, t);
+        }
+    }
+
+    public int Lifetime => fireLifetimeTicks;
 
     private void OnEnable()
     {
@@ -73,16 +84,27 @@ public class FireSimulation : MonoBehaviour
         StartCoroutine(PlayFire());
     }
 
+    public float SetSpeed(float speedValue)
+    {
+        speedValue = Mathf.Clamp(speedValue, 1f, 10f);
+        tickDuration = Mathf.Lerp(10f, 0.05f, (speedValue - 1f) / 9f);
+        return speedValue;
+    }
+    
+    public float SetLifetime(float lifetimeValue)
+    {
+        int lifetime = (int)Mathf.Clamp(lifetimeValue, 1f, 20f);
+        fireLifetimeTicks = lifetime;
+        return lifetime;
+    }
+
     private IEnumerator PlayFire()
     {
-        int maxTick = 0;
+        int finalTick = config.MaxTick + fireLifetimeTicks;
 
-        foreach (var t in config.FireData.Keys)
-            if (t > maxTick) maxTick = t;
-
-        for (currentTick = 0; currentTick <= maxTick; currentTick++)
+        for (currentTick = 0; currentTick <= finalTick; currentTick++)
         {
-            if (config.FireData.TryGetValue(currentTick, out var positions))
+            if (currentTick <= config.MaxTick && config.FireData.TryGetValue(currentTick, out var positions))
             {
                 foreach (var pos in positions)
                     SpawnFire(pos.x, pos.y);
@@ -90,7 +112,13 @@ public class FireSimulation : MonoBehaviour
 
             UpdateFireLifecycle();
 
-            yield return new WaitForSeconds(tickDuration);
+            float timer = 0f;
+
+            while (timer < tickDuration)
+            {
+                timer += Time.deltaTime;
+                yield return null;
+            }
         }
 
         Debug.Log("Simulation finished");
@@ -133,7 +161,7 @@ public class FireSimulation : MonoBehaviour
                 Matrix4x4 matrix = Matrix4x4.TRS(
                     fire.position,
                     Quaternion.identity,
-                    Vector3.one * cubeSize
+                    Vector3.one * meshSize
                 );
 
                 matrices.Add(matrix);
@@ -172,7 +200,7 @@ public class FireSimulation : MonoBehaviour
 
     private void RenderInstances()
     {
-        if (cubeMesh == null || instancedMaterial == null) return;
+        if (instancedMesh == null || instancedMaterial == null) return;
 
         const int batchSize = 1023;
 
@@ -186,7 +214,7 @@ public class FireSimulation : MonoBehaviour
                 batch.Add(matrices[i + j]);
 
             Graphics.DrawMeshInstanced(
-                cubeMesh,
+                instancedMesh,
                 0,
                 instancedMaterial,
                 batch

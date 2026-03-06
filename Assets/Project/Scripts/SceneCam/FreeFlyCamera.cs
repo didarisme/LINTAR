@@ -43,10 +43,13 @@ public class FreeFlyCamera : MonoBehaviour
 
     private void HandleMouseLook()
     {
-        if (Input.GetMouseButton(1)) // ПКМ
+        if (Input.GetMouseButton(1))
         {
-            yaw += Input.GetAxis("Mouse X") * mouseSensitivity * 100f * Time.deltaTime;
-            pitch -= Input.GetAxis("Mouse Y") * mouseSensitivity * 100f * Time.deltaTime;
+            float mouseX = Input.GetAxis("Mouse X") * mouseSensitivity;
+            float mouseY = Input.GetAxis("Mouse Y") * mouseSensitivity;
+
+            yaw += mouseX;
+            pitch -= mouseY;
 
             pitch = Mathf.Clamp(pitch, minPitch, maxPitch);
 

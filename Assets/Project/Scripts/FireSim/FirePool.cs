@@ -19,7 +19,6 @@ public class FirePool : MonoBehaviour
 
     private GameObject Create()
     {
-        Debug.Log("New Fire object was created!");
         GameObject obj = Instantiate(firePrefab, transform);
         obj.SetActive(false);
         return obj;

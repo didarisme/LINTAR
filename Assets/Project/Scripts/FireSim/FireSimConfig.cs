@@ -12,4 +12,6 @@ public class FireSimConfig
     public double3 MapCenter;
 
     public Dictionary<int, List<Vector2Int>> FireData;
+
+    public int MaxTick;
 }

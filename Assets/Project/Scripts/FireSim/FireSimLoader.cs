@@ -7,23 +7,32 @@ using UnityEngine;
 public class FireSimLoader : MonoBehaviour
 {
     [Header("File")]
-    [SerializeField] private TextAsset fireFile;
+    [SerializeField] private FireScenarioSelectionSO fireScenario;
 
     public event Action<FireSimConfig> OnDataLoaded;
 
     private void Start()
     {
+        if (fireScenario == null || fireScenario.SelectedScenario == null)
+        {
+            Debug.LogError("Fire scenario not selected!");
+            return;
+        }
+
         LoadFile();
     }
 
     private void LoadFile()
     {
+        TextAsset fireFile = fireScenario.SelectedScenario;
+
         var fireData = new Dictionary<int, List<Vector2Int>>();
 
         int minPx = 0, maxPx = 0, minPy = 0, maxPy = 0;
         double centerLon = 0, centerLat = 0;
         float patchWidthMeters = 0f, patchHeightMeters = 0f;
         float centerPx = 0f, centerPy = 0f;
+        int maxTick = 0;
 
         string[] lines = fireFile.text.Split('\n');
 
@@ -60,6 +69,9 @@ public class FireSimLoader : MonoBehaviour
             int x = int.Parse(parts[1]);
             int y = int.Parse(parts[2]);
 
+            if (tick > maxTick)
+                maxTick = tick;
+
             if (!fireData.ContainsKey(tick))
                 fireData[tick] = new List<Vector2Int>();
 
@@ -73,7 +85,8 @@ public class FireSimLoader : MonoBehaviour
             CenterPx = centerPx,
             CenterPy = centerPy,
             MapCenter = new double3(centerLon, centerLat, 600f),
-            FireData = fireData
+            FireData = fireData,
+            MaxTick = maxTick
         };
 
         OnDataLoaded?.Invoke(config);
