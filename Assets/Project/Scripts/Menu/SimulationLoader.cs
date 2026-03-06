@@ -9,39 +9,48 @@ public class SimulationLoader : MonoBehaviour
     [SerializeField] private FireScenarioSelectionSO fireScenario;
 
     [Header("References")]
-    public Transform contentParent;
-    public GameObject simButtonPrefab;
-    public Button continueButton;
+    [SerializeField] private Transform  contentParent;
+    [SerializeField] private GameObject simButtonPrefab;
+    [SerializeField] private Button     continueButton;
 
     [Header("Colors")]
-    public Color normalColor = new Color(0.12f, 0.12f, 0.16f);
-    public Color selectedColor = new Color(0.25f, 0.35f, 0.7f);
+    [SerializeField] private Color normalColor   = new Color(0.12f, 0.12f, 0.16f);
+    [SerializeField] private Color selectedColor = new Color(0.25f, 0.35f, 0.7f);
 
-    private string selectedFilePath = null;
-    private GameObject selectedButton = null;
+    private string     _folderPath;
+    private string     _selectedFilePath;
+    private GameObject _selectedButton;
 
-    void Start()
+    private void Start()
     {
+        _folderPath = Path.Combine(Application.streamingAssetsPath, "FireScenarios");
+
         continueButton.interactable = false;
         continueButton.onClick.AddListener(OnContinuePressed);
+
         LoadSimulations();
     }
 
-    void LoadSimulations()
+    private void LoadSimulations()
     {
-        string folderPath = Path.Combine(Application.dataPath, "Project/Source/FireScenarios");
-
-        if (!Directory.Exists(folderPath))
+        if (!Directory.Exists(_folderPath))
         {
-            Debug.LogError("Folder not found: " + folderPath);
+            Debug.LogError("Folder not found: " + _folderPath);
             return;
         }
 
-        string[] files = Directory.GetFiles(folderPath, "*.txt");
+        string[] files = Directory.GetFiles(_folderPath, "*.txt");
+
+        if (files.Length == 0)
+        {
+            Debug.LogWarning("No .txt files found in: " + _folderPath);
+            return;
+        }
 
         foreach (string file in files)
         {
             string fileName = Path.GetFileNameWithoutExtension(file);
+
             GameObject btn = Instantiate(simButtonPrefab, contentParent);
             btn.GetComponentInChildren<TextMeshProUGUI>().text = fileName;
             btn.GetComponent<Image>().color = normalColor;
@@ -54,39 +63,23 @@ public class SimulationLoader : MonoBehaviour
         }
     }
 
-    void SelectSimulation(string path, GameObject btn)
+    private void SelectSimulation(string path, GameObject btn)
     {
-        // Reset color of previous button
-        if (selectedButton != null)
-            selectedButton.GetComponent<Image>().color = normalColor;
+        if (_selectedButton != null)
+            _selectedButton.GetComponent<Image>().color = normalColor;
 
-        selectedFilePath = path;
-        selectedButton = btn;
+        _selectedFilePath = path;
+        _selectedButton   = btn;
 
-        // Change the color of selected button
         btn.GetComponent<Image>().color = selectedColor;
-
         continueButton.interactable = true;
     }
-    /*
-        void OnContinuePressed()
-        {
-            if (selectedFilePath == null) return;
 
-            SimulationData.filePath = selectedFilePath;
-            SimulationData.content  = File.ReadAllText(selectedFilePath);
-
-            UnityEngine.SceneManagement.SceneManager.LoadScene("SimulationScene");
-        }  */
-
-    //Delete after tests and uncomment upper func
-    void OnContinuePressed()
+    private void OnContinuePressed()
     {
-        if (selectedFilePath == null) return;
+        if (_selectedFilePath == null) return;
 
-        string content = File.ReadAllText(selectedFilePath);
-
-        // создаём временный TextAsset
+        string content = File.ReadAllText(_selectedFilePath);
         fireScenario.SelectedScenario = new TextAsset(content);
 
         SceneManager.LoadScene("CesuimShowcase");
