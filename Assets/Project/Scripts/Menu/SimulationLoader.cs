@@ -9,9 +9,10 @@ public class SimulationLoader : MonoBehaviour
     [SerializeField] private FireScenarioSelectionSO fireScenario;
 
     [Header("References")]
-    [SerializeField] private Transform  contentParent;
-    [SerializeField] private GameObject simButtonPrefab;
-    [SerializeField] private Button     continueButton;
+    [SerializeField] private Transform          contentParent;
+    [SerializeField] private GameObject         simButtonPrefab;
+    [SerializeField] private Button             continueButton;
+    [SerializeField] private ConfirmationDialog confirmationDialog;
 
     [Header("Colors")]
     [SerializeField] private Color normalColor   = new Color(0.12f, 0.12f, 0.16f);
@@ -27,6 +28,20 @@ public class SimulationLoader : MonoBehaviour
 
         continueButton.interactable = false;
         continueButton.onClick.AddListener(OnContinuePressed);
+    }
+
+    private void OnEnable()
+    {
+        if (string.IsNullOrEmpty(_folderPath))
+            _folderPath = Path.Combine(Application.streamingAssetsPath, "FireScenarios");
+
+        // Очищаем старый список
+        foreach (Transform child in contentParent)
+            Destroy(child.gameObject);
+
+        _selectedFilePath = null;
+        _selectedButton   = null;
+        continueButton.interactable = false;
 
         LoadSimulations();
     }
@@ -56,10 +71,21 @@ public class SimulationLoader : MonoBehaviour
             btn.GetComponent<Image>().color = normalColor;
 
             string filePath = file;
+
             btn.GetComponent<Button>().onClick.AddListener(() =>
+                SelectSimulation(filePath, btn));
+
+            Transform deleteTransform = btn.transform.Find("DeleteBtn");
+            if (deleteTransform != null)
             {
-                SelectSimulation(filePath, btn);
-            });
+                Button deleteBtn = deleteTransform.GetComponent<Button>();
+                if (deleteBtn != null)
+                {
+                    deleteBtn.onClick.AddListener(() =>
+                        confirmationDialog.Show(fileName, () =>
+                            DeleteSimulation(filePath, btn)));
+                }
+            }
         }
     }
 
@@ -73,6 +99,21 @@ public class SimulationLoader : MonoBehaviour
 
         btn.GetComponent<Image>().color = selectedColor;
         continueButton.interactable = true;
+    }
+
+    private void DeleteSimulation(string filePath, GameObject btn)
+    {
+        if (File.Exists(filePath))
+            File.Delete(filePath);
+
+        if (_selectedFilePath == filePath)
+        {
+            _selectedFilePath = null;
+            _selectedButton   = null;
+            continueButton.interactable = false;
+        }
+
+        Destroy(btn);
     }
 
     private void OnContinuePressed()
