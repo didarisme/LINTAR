@@ -768,7 +768,7 @@ GameObject:
   - component: {fileID: 105407637}
   - component: {fileID: 105407640}
   - component: {fileID: 105407639}
-  - component: {fileID: 105407638}
+  - component: {fileID: 105407641}
   m_Layer: 5
   m_Name: Scroll View
   m_TagString: Untagged
@@ -798,36 +798,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: -30}
   m_SizeDelta: {x: 1720, y: 500}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &105407638
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 105407636}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Content: {fileID: 660223291}
-  m_Horizontal: 0
-  m_Vertical: 1
-  m_MovementType: 1
-  m_Elasticity: 0.1
-  m_Inertia: 1
-  m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 0.1
-  m_Viewport: {fileID: 1083367271}
-  m_HorizontalScrollbar: {fileID: 1106530824}
-  m_VerticalScrollbar: {fileID: 1790025527}
-  m_HorizontalScrollbarVisibility: 1
-  m_VerticalScrollbarVisibility: 1
-  m_HorizontalScrollbarSpacing: -3
-  m_VerticalScrollbarSpacing: -3
-  m_OnValueChanged:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &105407639
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -866,6 +836,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 105407636}
   m_CullTransparentMesh: 1
+--- !u!114 &105407641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105407636}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 262451fdfc322104795dd2c851e2e1a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_Content: {fileID: 660223291}
+  m_Horizontal: 0
+  m_Vertical: 1
+  m_MovementType: 1
+  m_Elasticity: 0.1
+  m_Inertia: 1
+  m_DecelerationRate: 0.135
+  m_ScrollSensitivity: 1
+  m_Viewport: {fileID: 1083367271}
+  m_HorizontalScrollbar: {fileID: 1106530824}
+  m_VerticalScrollbar: {fileID: 1790025527}
+  m_HorizontalScrollbarVisibility: 1
+  m_VerticalScrollbarVisibility: 1
+  m_HorizontalScrollbarSpacing: 0
+  m_VerticalScrollbarSpacing: 0
+  m_OnValueChanged:
+    m_PersistentCalls:
+      m_Calls: []
+  smoothSpeed: 12
+  scrollMultiplier: 3
 --- !u!1 &111538164
 GameObject:
   m_ObjectHideFlags: 0
@@ -2178,8 +2180,13 @@ MonoBehaviour:
   simButtonPrefab: {fileID: 5832082768681216906, guid: f4c761c3a7a81b443a1ec4b79c9ca8b8, type: 3}
   continueButton: {fileID: 1008336958}
   confirmationDialog: {fileID: 854764841}
+  scrollRect: {fileID: 105407641}
   normalColor: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 1}
   selectedColor: {r: 0.7607843, g: 0.3529412, b: 0.101960786, a: 1}
+  entryDuration: 0.35
+  entryStagger: 0.06
+  colorLerpSpeed: 8
+  exitDuration: 0.25
 --- !u!1 &417150707
 GameObject:
   m_ObjectHideFlags: 0
@@ -3662,7 +3669,7 @@ MonoBehaviour:
     m_Right: 0
     m_Top: 0
     m_Bottom: 0
-  m_ChildAlignment: 4
+  m_ChildAlignment: 1
   m_Spacing: 30
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 1
@@ -4361,15 +4368,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   embersLayer: {fileID: 1999299716}
-  count: 150
-  minSize: 5
-  maxSize: 10
+  count: 300
+  minSize: 10
+  maxSize: 20
   minSpeed: 60
   maxSpeed: 180
   minDrift: 10
   maxDrift: 40
   minDriftFreq: 0.5
   maxDriftFreq: 2
+  turbulence: 25
+  flickerSpeed: 8
+  flickerAmount: 0.3
+  rotationSpeed: 90
+  shrinkAmount: 0.4
 --- !u!1 &804818995
 GameObject:
   m_ObjectHideFlags: 0
@@ -5225,18 +5237,6 @@ MonoBehaviour:
           m_BoolArgument: 1
         m_CallState: 2
       - m_Target: {fileID: 1093549594}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 803509050}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
