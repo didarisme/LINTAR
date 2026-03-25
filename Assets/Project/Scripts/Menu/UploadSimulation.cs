@@ -7,10 +7,17 @@ using SFB;
 public class UploadSimulation : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private Button            uploadPanel;
-    [SerializeField] private Button            continueButton;
-    [SerializeField] private TextMeshProUGUI   labelText;
-    [SerializeField] private TextMeshProUGUI   fileNameText;
+    [SerializeField] private Button          uploadPanel;
+    [SerializeField] private Button          continueButton;
+    [SerializeField] private TextMeshProUGUI labelText;
+    [SerializeField] private TextMeshProUGUI fileNameText;
+    [SerializeField] private GameObject      postUploadButtons;
+    [SerializeField] private Button          btnUploadAnother;
+    [SerializeField] private Button          btnGoToSims;
+
+    [Header("Screens")]
+    [SerializeField] private GameObject uploadSimPanel;
+    [SerializeField] private GameObject chooseSimPanel;
 
     [Header("Colors")]
     [SerializeField] private Color defaultColor  = new Color(0.5f, 0.5f, 0.5f);
@@ -18,8 +25,8 @@ public class UploadSimulation : MonoBehaviour
     [SerializeField] private Color successColor  = new Color(0.3f, 0.8f, 0.4f);
     [SerializeField] private Color warningColor  = new Color(0.9f, 0.7f, 0.2f);
 
-    private string _targetFolder;
-    private string _pendingFilePath;
+    private string   _targetFolder;
+    private string[] _pendingFilePaths;
 
     private void Start()
     {
@@ -32,6 +39,21 @@ public class UploadSimulation : MonoBehaviour
         continueButton.onClick.AddListener(OnContinuePressed);
         uploadPanel.onClick.AddListener(OpenFileDialog);
 
+        btnUploadAnother.onClick.AddListener(OnUploadAnother);
+        btnGoToSims.onClick.AddListener(OnGoToSims);
+
+        postUploadButtons.SetActive(false);
+        SetDefault();
+    }
+
+    private void OnDisable()
+    {
+        _pendingFilePaths = null;  // ← исправлено
+
+        continueButton.gameObject.SetActive(true);
+        continueButton.interactable = false;
+        postUploadButtons.SetActive(false);
+
         SetDefault();
     }
 
@@ -40,37 +62,72 @@ public class UploadSimulation : MonoBehaviour
         var extensions = new[] { new ExtensionFilter("Text Files", "txt") };
 
         string[] paths = StandaloneFileBrowser.OpenFilePanel(
-            "Select Simulation File", "", extensions, false);
+            "Select Simulation Files", "", extensions, true);
 
-        if (paths.Length == 0 || string.IsNullOrEmpty(paths[0])) return;
+        if (paths.Length == 0) return;
 
-        _pendingFilePath = paths[0];
-        SetStatus("Selected:", Path.GetFileName(_pendingFilePath), selectedColor);
+        string label = paths.Length == 1
+            ? Path.GetFileName(paths[0])
+            : $"{paths.Length} files selected";
+
+        SetStatus("Selected:", label, selectedColor);
+
+        _pendingFilePaths = paths;
         continueButton.interactable = true;
     }
 
     private void OnContinuePressed()
     {
-        if (_pendingFilePath == null) return;
+        if (_pendingFilePaths == null || _pendingFilePaths.Length == 0) return;
 
-        string fileName = Path.GetFileName(_pendingFilePath);
-        string destPath = Path.Combine(_targetFolder, fileName);
+        int uploaded = 0;
+        int skipped  = 0;
 
-        if (File.Exists(destPath))
+        foreach (string path in _pendingFilePaths)
         {
-            SetStatus("Already exists:", fileName, warningColor);
-            continueButton.interactable = false;
-            _pendingFilePath = null;
-            return;
+            string fileName = Path.GetFileName(path);
+            string destPath = Path.Combine(_targetFolder, fileName);
+
+            if (File.Exists(destPath))
+            {
+                skipped++;
+                continue;
+            }
+
+            File.Copy(path, destPath);
+            uploaded++;
         }
 
-        File.Copy(_pendingFilePath, destPath);
-        _pendingFilePath = null;
+        _pendingFilePaths = null;
 
-        SetStatus("Uploaded:", fileName, successColor);
+        if (skipped > 0 && uploaded == 0)
+            SetStatus("All files already exist:", $"{skipped} skipped", warningColor);
+        else if (skipped > 0)
+            SetStatus("Uploaded:", $"{uploaded} files ({skipped} skipped)", successColor);
+        else
+            SetStatus("Uploaded:", $"{uploaded} file(s)", successColor);
+
+        continueButton.gameObject.SetActive(false);
+        postUploadButtons.SetActive(true);
+    }
+
+    private void OnUploadAnother()
+    {
+        continueButton.gameObject.SetActive(true);
         continueButton.interactable = false;
+        postUploadButtons.SetActive(false);
+        SetDefault();
+    }
 
-        Debug.Log("File uploaded: " + destPath);
+    private void OnGoToSims()
+    {
+        continueButton.gameObject.SetActive(true);
+        continueButton.interactable = false;
+        postUploadButtons.SetActive(false);
+        SetDefault();
+
+        uploadSimPanel.SetActive(false);
+        chooseSimPanel.SetActive(true);
     }
 
     private void SetDefault()
