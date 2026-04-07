@@ -4,52 +4,68 @@ using UnityEngine.UI;
 using TMPro;
 using SFB;
 
-public class UploadSimulation : MonoBehaviour
+public class UploadSimulation : Pageable
 {
-    [Header("References")]
-    [SerializeField] private Button          uploadPanel;
-    [SerializeField] private Button          continueButton;
+    [Header("Buttons")]
+    [SerializeField] private Button uploadPanelBtn;
+    [SerializeField] private Button uploadAnotherBtn;
+    [SerializeField] private Button continueButton;
+    [SerializeField] private Button btnGoToSims;
+
+    [Space]
+    [SerializeField] private GameObject uploadPanel;
+    [SerializeField] private GameObject postUploadButtons;
     [SerializeField] private TextMeshProUGUI labelText;
     [SerializeField] private TextMeshProUGUI fileNameText;
-    [SerializeField] private GameObject      postUploadButtons;
-    [SerializeField] private Button          btnUploadAnother;
-    [SerializeField] private Button          btnGoToSims;
-
-    [Header("Screens")]
-    [SerializeField] private GameObject uploadSimPanel;
-    [SerializeField] private GameObject chooseSimPanel;
 
     [Header("Colors")]
-    [SerializeField] private Color defaultColor  = new Color(0.5f, 0.5f, 0.5f);
+    [SerializeField] private Color defaultColor = new Color(0.5f, 0.5f, 0.5f);
     [SerializeField] private Color selectedColor = new Color(0.4f, 0.6f, 1f);
-    [SerializeField] private Color successColor  = new Color(0.3f, 0.8f, 0.4f);
-    [SerializeField] private Color warningColor  = new Color(0.9f, 0.7f, 0.2f);
+    [SerializeField] private Color successColor = new Color(0.3f, 0.8f, 0.4f);
+    [SerializeField] private Color warningColor = new Color(0.9f, 0.7f, 0.2f);
 
-    private string   _targetFolder;
+    private string _targetFolder;
     private string[] _pendingFilePaths;
 
+    private bool _initialized = false;
+
     private void Start()
+    {
+        if (!_initialized)
+        {
+            Initialize();
+            _initialized = true;
+        }
+    }
+
+    public override void OnOpen()
+    {
+        uploadPanel.SetActive(true);
+
+        ResetUI();
+    }
+
+    public override void OnClose()
+    {
+        _pendingFilePaths = null;
+        uploadPanel.SetActive(false);
+    }
+
+    private void Initialize()
     {
         _targetFolder = Path.Combine(Application.streamingAssetsPath, "FireScenarios");
 
         if (!Directory.Exists(_targetFolder))
             Directory.CreateDirectory(_targetFolder);
 
-        continueButton.interactable = false;
+        uploadPanelBtn.onClick.AddListener(OpenFileDialog);
         continueButton.onClick.AddListener(OnContinuePressed);
-        uploadPanel.onClick.AddListener(OpenFileDialog);
-
-        btnUploadAnother.onClick.AddListener(OnUploadAnother);
+        uploadAnotherBtn.onClick.AddListener(OnUploadAnother);
         btnGoToSims.onClick.AddListener(OnGoToSims);
-
-        postUploadButtons.SetActive(false);
-        SetDefault();
     }
 
-    private void OnDisable()
+    private void ResetUI()
     {
-        _pendingFilePaths = null;  // ← исправлено
-
         continueButton.gameObject.SetActive(true);
         continueButton.interactable = false;
         postUploadButtons.SetActive(false);
@@ -64,7 +80,7 @@ public class UploadSimulation : MonoBehaviour
         string[] paths = StandaloneFileBrowser.OpenFilePanel(
             "Select Simulation Files", "", extensions, true);
 
-        if (paths.Length == 0) return;
+        if (paths == null || paths.Length == 0) return;
 
         string label = paths.Length == 1
             ? Path.GetFileName(paths[0])
@@ -81,7 +97,7 @@ public class UploadSimulation : MonoBehaviour
         if (_pendingFilePaths == null || _pendingFilePaths.Length == 0) return;
 
         int uploaded = 0;
-        int skipped  = 0;
+        int skipped = 0;
 
         foreach (string path in _pendingFilePaths)
         {
@@ -113,34 +129,26 @@ public class UploadSimulation : MonoBehaviour
 
     private void OnUploadAnother()
     {
-        continueButton.gameObject.SetActive(true);
-        continueButton.interactable = false;
-        postUploadButtons.SetActive(false);
-        SetDefault();
+        ResetUI();
     }
 
     private void OnGoToSims()
     {
-        continueButton.gameObject.SetActive(true);
-        continueButton.interactable = false;
-        postUploadButtons.SetActive(false);
-        SetDefault();
 
-        uploadSimPanel.SetActive(false);
-        chooseSimPanel.SetActive(true);
+        Debug.Log("Go to simulations page");
     }
 
     private void SetDefault()
     {
         if (labelText != null)
         {
-            labelText.text  = "Click to select simulation file";
+            labelText.text = "Click to select simulation file";
             labelText.color = defaultColor;
         }
 
         if (fileNameText != null)
         {
-            fileNameText.text  = "Supported format: .txt — max 10 MB";
+            fileNameText.text = "Supported format: .txt";
             fileNameText.color = defaultColor;
         }
     }
@@ -149,13 +157,13 @@ public class UploadSimulation : MonoBehaviour
     {
         if (labelText != null)
         {
-            labelText.text  = label;
+            labelText.text = label;
             labelText.color = color;
         }
 
         if (fileNameText != null)
         {
-            fileNameText.text  = file;
+            fileNameText.text = file;
             fileNameText.color = color;
         }
     }

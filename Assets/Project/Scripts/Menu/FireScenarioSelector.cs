@@ -1,15 +1,17 @@
 using System.IO;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class FireScenarioSelector : MonoBehaviour
+public class FireScenarioSelector : Pageable
 {
     [SerializeField] private FireScenarioSelectorSO fireScenario;
 
     [Header("References")]
+    [SerializeField] private GameObject chooseSimPanel;
     [SerializeField] private Transform contentParent;
     [SerializeField] private GameObject simButtonPrefab;
     [SerializeField] private Button continueButton;
@@ -27,10 +29,14 @@ public class FireScenarioSelector : MonoBehaviour
     [SerializeField] private float exitDuration = 0.2f;
 
     private string _folderPath;
+
     private string _selectedFilePath;
     private GameObject _selectedButton;
 
-    private void Start()
+    private Dictionary<string, GameObject> _buttons = new();
+    private bool _initialized = false;
+
+    private void Awake()
     {
         _folderPath = Path.Combine(Application.streamingAssetsPath, "FireScenarios");
 
@@ -38,42 +44,43 @@ public class FireScenarioSelector : MonoBehaviour
         continueButton.onClick.AddListener(OnContinuePressed);
     }
 
-    private void OnEnable()
+    public override void OnOpen()
     {
-        ResetUI();
-        LoadSimulations();
+        chooseSimPanel.SetActive(true);
 
-        if (scrollRect != null)
-            StartCoroutine(ResetScrollPosition());
+        if (!_initialized)
+        {
+            LoadSimulationsInitial();
+            _initialized = true;
+        }
+        else
+        {
+            RefreshSimulations();
+        }
+
+        ResetSelection();
+        ResetScrollPosition();
     }
 
-    // ------------------------
-    // UI RESET
-    // ------------------------
-
-    private void ResetUI()
+    public override void OnClose()
     {
-        foreach (Transform child in contentParent)
-            Destroy(child.gameObject);
+        chooseSimPanel.SetActive(false);
+    }
 
+    private void ResetSelection()
+    {
         _selectedFilePath = null;
         _selectedButton = null;
         continueButton.interactable = false;
     }
 
-    private IEnumerator ResetScrollPosition()
+    private void ResetScrollPosition()
     {
-        yield return new WaitForEndOfFrame();
-
         scrollRect.verticalNormalizedPosition = 1f;
         scrollRect.velocity = Vector2.zero;
     }
 
-    // ------------------------
-    // LOAD FILES
-    // ------------------------
-
-    private void LoadSimulations()
+    private void LoadSimulationsInitial()
     {
         if (!Directory.Exists(_folderPath))
         {
@@ -83,15 +90,43 @@ public class FireScenarioSelector : MonoBehaviour
 
         string[] files = Directory.GetFiles(_folderPath, "*.txt");
 
-        if (files.Length == 0)
-        {
-            Debug.LogWarning("No .txt files found");
-            return;
-        }
-
         for (int i = 0; i < files.Length; i++)
         {
             CreateButton(files[i], i);
+        }
+    }
+
+    private void RefreshSimulations()
+    {
+        if (!Directory.Exists(_folderPath)) return;
+
+        string[] files = Directory.GetFiles(_folderPath, "*.txt");
+        HashSet<string> currentFiles = new(files);
+
+        int index = _buttons.Count;
+
+        foreach (var file in files)
+        {
+            if (!_buttons.ContainsKey(file))
+            {
+                CreateButton(file, index++);
+            }
+        }
+
+        var toRemove = new List<string>();
+
+        foreach (var kvp in _buttons)
+        {
+            if (!currentFiles.Contains(kvp.Key))
+            {
+                Destroy(kvp.Value);
+                toRemove.Add(kvp.Key);
+            }
+        }
+
+        foreach (var key in toRemove)
+        {
+            _buttons.Remove(key);
         }
     }
 
@@ -100,6 +135,7 @@ public class FireScenarioSelector : MonoBehaviour
         string fileName = Path.GetFileNameWithoutExtension(filePath);
 
         GameObject btn = Instantiate(simButtonPrefab, contentParent);
+
         btn.GetComponentInChildren<TextMeshProUGUI>().text = fileName;
 
         Image img = btn.GetComponent<Image>();
@@ -108,6 +144,8 @@ public class FireScenarioSelector : MonoBehaviour
         btn.GetComponent<Button>().onClick.AddListener(() => SelectSimulation(filePath, btn));
 
         SetupDeleteButton(btn, filePath, fileName);
+
+        _buttons[filePath] = btn;
 
         StartCoroutine(AnimateEntry(btn, index));
     }
@@ -124,10 +162,6 @@ public class FireScenarioSelector : MonoBehaviour
             confirmationDialog.Show(fileName, () =>
                 DeleteSimulation(filePath, btn)));
     }
-
-    // ------------------------
-    // SELECTION
-    // ------------------------
 
     private void SelectSimulation(string path, GameObject btn)
     {
@@ -161,10 +195,6 @@ public class FireScenarioSelector : MonoBehaviour
         img.color = target;
     }
 
-    // ------------------------
-    // DELETE
-    // ------------------------
-
     private void DeleteSimulation(string filePath, GameObject btn)
     {
         if (File.Exists(filePath))
@@ -172,10 +202,10 @@ public class FireScenarioSelector : MonoBehaviour
 
         if (_selectedFilePath == filePath)
         {
-            _selectedFilePath = null;
-            _selectedButton = null;
-            continueButton.interactable = false;
+            ResetSelection();
         }
+
+        _buttons.Remove(filePath);
 
         StartCoroutine(AnimateExit(btn));
     }
@@ -203,9 +233,9 @@ public class FireScenarioSelector : MonoBehaviour
         Destroy(btn);
     }
 
-    // ------------------------
+    // ========================
     // ENTRY ANIMATION
-    // ------------------------
+    // ========================
 
     private IEnumerator AnimateEntry(GameObject btn, int index)
     {
@@ -235,9 +265,9 @@ public class FireScenarioSelector : MonoBehaviour
         rect.localScale = Vector3.one;
     }
 
-    // ------------------------
+    // ========================
     // CONTINUE
-    // ------------------------
+    // ========================
 
     private void OnContinuePressed()
     {
