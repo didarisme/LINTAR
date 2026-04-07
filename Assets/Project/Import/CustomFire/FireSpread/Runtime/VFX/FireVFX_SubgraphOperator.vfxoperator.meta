@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 040cecf39866cad43a3f0d5885c3e0dd
+VisualEffectImporter:
+  externalObjects: {}
+  serializedVersion: 1
+  template:
+    name: 
+    category: 
+    description: 
+    icon: {instanceID: 0}
+    thumbnail: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 343626
+  packageName: LeMi - Fire Spread
+  packageVersion: 1.1
+  assetPath: Assets/LemiGame/FireSpread/Runtime/VFX/FireVFX_SubgraphOperator.vfxoperator
+  uploadId: 848770

@@ -1,0 +1,560 @@
+// FireSpread (Package)
+// GPU-accelerated fire spread with VFX Graph integration.
+
+#pragma kernel CSUpdateFires
+#pragma kernel CSSpreadFires
+#pragma kernel CSWriteBurnMap
+#pragma kernel CSGridUpdate
+#pragma kernel CSGridSpread
+#pragma kernel CSGridApplyNewFires
+#pragma kernel CSSeedFire
+#pragma kernel CSClearStateMapRegion
+
+#include "UnityCG.cginc"
+
+// Fire state (must match C# FireStateGPU layout)
+struct FireStateGPU
+{
+    int2 pixelPos;              // pixel coordinate
+    float startTime;            // ignition time
+    float durationMul;          // random duration multiplier
+    float spawnScale;           // random scale
+    float currentSpreadChance;  // current spread chance
+    float nextSpreadTime;       // next allowed spread time
+    int totalSpawns;            // spawn count
+    int totalChecks;            // check count
+    int isActive;               // 1 if active
+    int fireID;                 // id
+};
+
+// Buffers
+StructuredBuffer<FireStateGPU> _FireStates;
+AppendStructuredBuffer<float3> _VisiblePositions;  // visible fire world positions
+AppendStructuredBuffer<float4> _FireData;          // extra fire data for VFX: x=burnProgress, y=waitProgress, z=totalProgress, w=scale
+AppendStructuredBuffer<float4> _SpreadResults;     // spread results: x,y,spreadChance,delay
+
+// Textures
+Texture2D<float4> _BurnMap;      // sampled burn map
+RWTexture2D<float4> _BurnMapRW;  // writable burn map
+RWTexture2D<float4> _StateMap;   // CA state: R=startTime, G=durationMul, B=currentSpreadChance, A=cooldownUntil (0=empty)
+Texture2D<float> _GrassMask;     // optional grass mask
+Texture2D<float> _HeightTex;     // optional height map
+SamplerState sampler_LinearClamp;
+
+// World mapping
+float2 _OriginXZ;                // lower-left world (x,z)
+float2 _SizeXZ;                  // world size (w,d)
+float _HeightScale;              // height scale
+float _HeightOffset;             // height offset
+int _UseHeightTex;               // use height tex flag
+int _UseGrassMask;               // use grass mask flag
+
+// Params
+uint _FireCount;
+float _CurrentTime;
+float _BurnDuration;
+float _WaitDuration;
+float _RecoverPrepDuration;
+float _RecoverGrowDuration;
+uint _TextureWidth;
+uint _TextureHeight;
+
+// Spread params
+float _SpreadChanceDecay;
+float _MinSpreadChance;
+int _MaxSpreadAttempts; // Also used for perFireMaxChecks
+int _PerFireMaxSpawns;
+int _MaxFireCount;
+float _SpreadDelayMin;
+float _SpreadDelayMax;
+float _DurationMulMin;
+float _DurationMulMax;
+
+// Optional camera culling
+float3 _CamPos;
+float _Radius2;
+float _MaxUpdateDistance2;  // Maximum update distance squared (for distance culling)
+int _EnableCameraCulling;   // Enable camera distance culling (0 = disabled, 1 = enabled)
+
+// SeedFire params
+int _SeedPixelX;
+int _SeedPixelY;
+float _SeedStartTime;
+float _SeedDurationMul;
+float _SeedInitialChance;
+float _SeedCooldownUntil;
+
+// ClearStateMapRegion params
+int _ClearMinX;
+int _ClearMaxX;
+int _ClearMinY;
+int _ClearMaxY;
+
+// New-fire Append/Consume buffers
+struct NewFireData
+{
+    int2 pixel;
+    float startTime;
+    float durationMul;
+    float chance;
+    float cooldownUntil;
+};
+
+AppendStructuredBuffer<NewFireData> _NewFiresAppend;
+ConsumeStructuredBuffer<NewFireData> _NewFiresConsume;
+
+// Hash/random helpers
+float Hash(float2 p)
+{
+    p = frac(p * float2(443.8975, 397.2973));
+    p += dot(p.xy, p.yx + 19.19);
+    return frac(p.x * p.y);
+}
+
+float Random(float seed)
+{
+    return frac(sin(seed * 12.9898) * 43758.5453);
+}
+
+// Update fires and collect visible positions (for burning phase)
+[numthreads(64, 1, 1)]
+void CSUpdateFires(uint3 id : SV_DispatchThreadID)
+{
+    uint idx = id.x;
+    if (idx >= _FireCount) return;
+
+    FireStateGPU fire = _FireStates[idx];
+    if (fire.isActive == 0) return;
+
+    float elapsedTime = _CurrentTime - fire.startTime;
+
+    float burnDur = _BurnDuration * fire.durationMul;
+    float waitDur = _WaitDuration * fire.durationMul;
+    float recoverPrepDur = _RecoverPrepDuration * fire.durationMul;
+    float recoverGrowDur = _RecoverGrowDuration * fire.durationMul;
+    float totalDuration = burnDur + waitDur + recoverPrepDur + recoverGrowDur;
+
+    if (elapsedTime >= totalDuration)
+    {
+        return;
+    }
+
+    float burnValue = 0.0;
+    float waitValue = 0.0;
+
+    if (elapsedTime <= burnDur)
+    {
+        float progress = elapsedTime / burnDur;
+        burnValue = progress;
+        waitValue = 0.0;
+    }
+    else if (elapsedTime <= burnDur + waitDur)
+    {
+        float waitElapsed = elapsedTime - burnDur;
+        float progress = waitElapsed / waitDur;
+        burnValue = 1.0;
+        waitValue = progress;
+    }
+    else if (elapsedTime <= burnDur + waitDur + recoverPrepDur)
+    {
+        float prepElapsed = elapsedTime - burnDur - waitDur;
+        float progress = prepElapsed / recoverPrepDur;
+        burnValue = 1.0 - progress;
+        waitValue = 1.0;
+    }
+    else
+    {
+        float growElapsed = elapsedTime - burnDur - waitDur - recoverPrepDur;
+        float progress = growElapsed / recoverGrowDur;
+        burnValue = 0.0;
+        waitValue = 1.0 - progress;
+    }
+
+    // If in burn phase, append to VFX buffers
+    if (elapsedTime <= burnDur)
+    {
+        float2 uv = float2((fire.pixelPos.x + 0.5) / _TextureWidth,
+                           1.0 - ((fire.pixelPos.y + 0.5) / _TextureHeight));
+        
+        float wx = _OriginXZ.x + uv.x * _SizeXZ.x;
+        float wz = _OriginXZ.y + uv.y * _SizeXZ.y;
+        
+        float wy = 0.0;
+        if (_UseHeightTex > 0)
+        {
+            float h = _HeightTex.SampleLevel(sampler_LinearClamp, uv, 0);
+            wy = h * _HeightScale + _HeightOffset;
+        }
+        
+        float3 worldPos = float3(wx, wy, wz);
+        
+        // Camera culling: only append if within radius (XZ distance only)
+        float3 d = worldPos - _CamPos;
+        d.y = 0;  // Ignore Y axis, use XZ distance only
+        if (dot(d, d) <= _Radius2)
+        {
+            _VisiblePositions.Append(worldPos);
+            
+            float burnProgress = elapsedTime / burnDur;
+            float waitProgress = 0.0;
+            float totalDur = totalDuration;
+            float totalProgress = elapsedTime / totalDur;
+            if (elapsedTime > burnDur && elapsedTime <= burnDur + waitDur)
+            {
+                waitProgress = (elapsedTime - burnDur) / waitDur;
+            }
+            else if (elapsedTime > burnDur + waitDur)
+            {
+                waitProgress = 1.0;
+            }
+            float4 fireData = float4(burnProgress, waitProgress, totalProgress, fire.spawnScale);
+            _FireData.Append(fireData);
+        }
+    }
+}
+
+// Spread logic (probabilistic, attempts, masks)
+[numthreads(64, 1, 1)]
+void CSSpreadFires(uint3 id : SV_DispatchThreadID)
+{
+    uint idx = id.x;
+    if (idx >= _FireCount) return;
+
+    FireStateGPU fire = _FireStates[idx];
+    if (fire.isActive == 0) return;
+
+    float elapsedTime = _CurrentTime - fire.startTime;
+    float burnDur = _BurnDuration * fire.durationMul;
+
+    // Only between 20% and end of burn phase
+    if (elapsedTime < burnDur * 0.2f) return;
+    if (elapsedTime >= burnDur) return;
+    if (_CurrentTime < fire.nextSpreadTime) return;
+    if (fire.totalChecks >= _MaxSpreadAttempts) return; // Use same value as maxSpreadAttempts
+    if (fire.totalSpawns >= _PerFireMaxSpawns) return;
+    if (fire.currentSpreadChance <= _MinSpreadChance) return;
+
+    int2 directions[8] = {
+        int2(1, 0),
+        int2(-1, 0),
+        int2(0, 1),
+        int2(0, -1),
+        int2(1, 1),
+        int2(1, -1),
+        int2(-1, 1),
+        int2(-1, -1)
+    };
+
+    float seed = fire.fireID * 123.456 + _CurrentTime * 789.012;
+    uint startDir = (uint)(Random(seed) * 8.0);
+
+    int spreadAttempts = 0;
+    bool spawnedOne = false;
+
+    for (int i = 0; i < 8 && !spawnedOne && spreadAttempts < _MaxSpreadAttempts; i++)
+    {
+        uint dirIdx = (startDir + (uint)i) % 8u;
+        int2 dir = directions[(int)dirIdx];
+        
+        spreadAttempts++;
+        int2 newPixel = fire.pixelPos + dir;
+        
+        if (newPixel.x < 0 || (uint)newPixel.x >= _TextureWidth || newPixel.y < 0 || (uint)newPixel.y >= _TextureHeight)
+            continue;
+
+        float2 uv = float2((newPixel.x + 0.5) / _TextureWidth,
+                           1.0 - ((newPixel.y + 0.5) / _TextureHeight));
+        float4 burnColor = _BurnMap.SampleLevel(sampler_LinearClamp, uv, 0);
+        if (burnColor.r > 0.1) continue;
+
+        if (_UseGrassMask > 0)
+        {
+            float grassValue = _GrassMask.SampleLevel(sampler_LinearClamp, uv, 0);
+            if (grassValue < 0.5) continue;
+        }
+
+        float randomVal = Random(seed + dirIdx * 0.1);
+        if (randomVal > fire.currentSpreadChance)
+            continue;
+
+        float childChance = max(_MinSpreadChance, fire.currentSpreadChance * (1.0 - _SpreadChanceDecay));
+        float delay = lerp(_SpreadDelayMin, _SpreadDelayMax, Random(seed + dirIdx * 0.2));
+
+        _SpreadResults.Append(float4(newPixel.x, newPixel.y, childChance, delay));
+        spawnedOne = true;
+        break;
+    }
+}
+
+// Write burn map (R/G channels) based on current fire states
+[numthreads(64, 1, 1)]
+void CSWriteBurnMap(uint3 id : SV_DispatchThreadID)
+{
+    uint idx = id.x;
+    if (idx >= _FireCount) return;
+
+    FireStateGPU fire = _FireStates[idx];
+    if (fire.isActive == 0) return;
+
+    float elapsedTime = _CurrentTime - fire.startTime;
+
+    float burnDur = _BurnDuration * fire.durationMul;
+    float waitDur = _WaitDuration * fire.durationMul;
+    float recoverPrepDur = _RecoverPrepDuration * fire.durationMul;
+    float recoverGrowDur = _RecoverGrowDuration * fire.durationMul;
+    float totalDuration = burnDur + waitDur + recoverPrepDur + recoverGrowDur;
+
+    if (elapsedTime < 0.0) return;
+    if (elapsedTime >= totalDuration) return;
+
+    float r = 0.0;
+    float g = 0.0;
+
+    if (elapsedTime <= burnDur)
+    {
+        r = (burnDur > 0.0) ? (elapsedTime / burnDur) : 1.0;
+        g = 0.0;
+    }
+    else if (elapsedTime <= burnDur + waitDur)
+    {
+        r = 1.0;
+        float wt = elapsedTime - burnDur;
+        g = (waitDur > 0.0) ? (wt / waitDur) : 1.0;
+    }
+    else if (elapsedTime <= burnDur + waitDur + recoverPrepDur)
+    {
+        float pt = elapsedTime - burnDur - waitDur;
+        float p = (recoverPrepDur > 0.0) ? (pt / recoverPrepDur) : 1.0;
+        r = 1.0 - p;
+        g = 1.0;
+    }
+    else
+    {
+        float gt = elapsedTime - burnDur - waitDur - recoverPrepDur;
+        float p = (recoverGrowDur > 0.0) ? (gt / recoverGrowDur) : 1.0;
+        r = 0.0;
+        g = 1.0 - p;
+    }
+
+    int2 px = fire.pixelPos;
+    if (px.x < 0 || (uint)px.x >= _TextureWidth || px.y < 0 || (uint)px.y >= _TextureHeight) return;
+
+    int writeY = (int)((uint)_TextureHeight - 1) - px.y; // flip V axis
+    _BurnMapRW[int2(px.x, writeY)] = float4(r, g, 0.0, 1.0);
+}
+
+// ===== CA grid: update per-pixel burn and lifecycle =====
+[numthreads(8, 8, 1)]
+void CSGridUpdate(uint3 tid : SV_DispatchThreadID)
+{
+    if (tid.x >= _TextureWidth || tid.y >= _TextureHeight) return;
+
+    float4 s = _StateMap[int2(tid.x, tid.y)];
+    float startTime = s.r;
+    if (startTime <= 0.0) return; // empty
+
+    // Check camera culling FIRST to avoid expensive calculations for out-of-range pixels
+    bool isOutsideRange = false;
+    if (_EnableCameraCulling > 0)
+    {
+        // Convert pixel to world position (XZ only for distance check)
+        float2 uv = float2((tid.x + 0.5) / _TextureWidth, 1.0 - ((tid.y + 0.5) / _TextureHeight));
+        float wx = _OriginXZ.x + uv.x * _SizeXZ.x;
+        float wz = _OriginXZ.y + uv.y * _SizeXZ.y;
+        
+        // Check distance from camera (XZ distance only, ignore Y)
+        float3 d = float3(wx, 0, wz) - float3(_CamPos.x, 0, _CamPos.z);
+        float distSqr = dot(d, d);
+        
+        if (distSqr > _MaxUpdateDistance2)
+        {
+            isOutsideRange = true;
+        }
+    }
+
+    // Calculate time-based values (needed for recovery completion check)
+    float durationMul = s.g;
+    float elapsedTime = _CurrentTime - startTime;
+    float burnDur = _BurnDuration * durationMul;
+    float waitDur = _WaitDuration * durationMul;
+    float prepDur = _RecoverPrepDuration * durationMul;
+    float growDur = _RecoverGrowDuration * durationMul;
+    float totalDuration = burnDur + waitDur + prepDur + growDur;
+
+    int writeY = (int)((uint)_TextureHeight - 1) - (int)tid.y; // flip V
+
+    // Check if recovery is complete - clear even if outside camera range
+    // This prevents pixels from staying in stateMap forever when outside camera range
+    if (elapsedTime >= totalDuration)
+    {
+        _StateMap[int2(tid.x, tid.y)] = float4(0,0,0,0);
+        _BurnMapRW[int2(tid.x, writeY)] = float4(0, 0, 0, 1.0);
+        return;
+    }
+
+    // If outside range and not recovered, skip all update calculations
+    if (isOutsideRange)
+    {
+        return; // Skip this pixel, but keep state unchanged
+    }
+
+    float r = 0.0;
+    float g = 0.0;
+    if (elapsedTime <= burnDur)
+    {
+        r = (burnDur > 0.0) ? (elapsedTime / burnDur) : 1.0;
+        g = 0.0;
+    }
+    else if (elapsedTime <= burnDur + waitDur)
+    {
+        r = 1.0;
+        float wt = elapsedTime - burnDur;
+        g = (waitDur > 0.0) ? (wt / waitDur) : 1.0;
+    }
+    else if (elapsedTime <= burnDur + waitDur + prepDur)
+    {
+        float pt = elapsedTime - burnDur - waitDur;
+        float p = (prepDur > 0.0) ? (pt / prepDur) : 1.0;
+        r = 1.0 - p;
+        g = 1.0;
+    }
+    else
+    {
+        float gt = elapsedTime - burnDur - waitDur - prepDur;
+        float p = (growDur > 0.0) ? (gt / growDur) : 1.0;
+        r = 0.0;
+        g = 1.0 - p;
+    }
+
+    // writeY was already calculated above
+    _BurnMapRW[int2(tid.x, writeY)] = float4(r, g, 0.0, 1.0);
+}
+
+[numthreads(8, 8, 1)]
+void CSGridSpread(uint3 tid : SV_DispatchThreadID)
+{
+    if (tid.x >= _TextureWidth || tid.y >= _TextureHeight) return;
+
+    // Performance optimization: Skip pixels outside camera range if culling is enabled
+    if (_EnableCameraCulling > 0)
+    {
+        // Convert pixel to world position (XZ only for distance check)
+        float2 uv = float2((tid.x + 0.5) / _TextureWidth, 1.0 - ((tid.y + 0.5) / _TextureHeight));
+        float wx = _OriginXZ.x + uv.x * _SizeXZ.x;
+        float wz = _OriginXZ.y + uv.y * _SizeXZ.y;
+        
+        // Check distance from camera (XZ distance only, ignore Y)
+        float3 d = float3(wx, 0, wz) - float3(_CamPos.x, 0, _CamPos.z);
+        float distSqr = dot(d, d);
+        
+        // Skip if outside max update distance
+        if (distSqr > _MaxUpdateDistance2)
+        {
+            return; // Skip spread for this pixel, but keep state unchanged
+        }
+    }
+
+    float4 s = _StateMap[int2(tid.x, tid.y)];
+    float startTime = s.r;
+    if (startTime <= 0.0) return; // empty
+
+    float durationMul = s.g;
+    float chance = s.b;
+    float cooldownUntil = s.a;
+
+    float elapsedTime = _CurrentTime - startTime;
+    float burnDur = _BurnDuration * durationMul;
+
+    if (elapsedTime < burnDur * 0.2) return;
+    if (elapsedTime >= burnDur) return;
+    if (_CurrentTime < cooldownUntil) return;
+    if (chance <= _MinSpreadChance) return;
+
+    float seed = (tid.x + 37) * 123.456 + (tid.y + 73) * 789.012 + _CurrentTime * 17.0;
+    uint startDir = (uint)(Random(seed) * 8.0);
+
+    int2 dirs[8] = { int2(1,0), int2(-1,0), int2(0,1), int2(0,-1), int2(1,1), int2(1,-1), int2(-1,1), int2(-1,-1) };
+    int attempts = 0;
+    bool spawned = false;
+
+    for (int i = 0; i < 8 && !spawned && attempts < _MaxSpreadAttempts; i++)
+    {
+        uint di = (startDir + (uint)i) % 8u;
+        int2 np = int2((int)tid.x, (int)tid.y) + dirs[(int)di];
+        attempts++;
+
+        if (np.x < 0 || (uint)np.x >= _TextureWidth || np.y < 0 || (uint)np.y >= _TextureHeight) continue;
+
+        float2 uv = float2((np.x + 0.5) / _TextureWidth, 1.0 - ((np.y + 0.5) / _TextureHeight));
+        float4 burnColor = _BurnMap.SampleLevel(sampler_LinearClamp, uv, 0);
+        if (burnColor.r > 0.1) continue;
+
+        if (_UseGrassMask > 0)
+        {
+            float g = _GrassMask.SampleLevel(sampler_LinearClamp, uv, 0);
+            if (g < 0.5) continue;
+        }
+
+        float rv = Random(seed + di * 0.13);
+        if (rv > chance) continue;
+
+        float newChance = max(_MinSpreadChance, chance * (1.0 - _SpreadChanceDecay));
+        float delay = lerp(_SpreadDelayMin, _SpreadDelayMax, Random(seed + di * 0.21));
+        float durationMulChild = lerp(_DurationMulMin, _DurationMulMax, Random(seed + di * 0.37));
+
+        NewFireData nf;
+        nf.pixel = np;
+        nf.startTime = _CurrentTime;
+        nf.durationMul = durationMulChild;
+        nf.chance = newChance;
+        nf.cooldownUntil = _CurrentTime + delay;
+
+        _NewFiresAppend.Append(nf);
+        spawned = true;
+    }
+
+    float newCooldown = _CurrentTime + lerp(_SpreadDelayMin, _SpreadDelayMax, Random(seed + 0.91));
+    float newChance = max(_MinSpreadChance, chance * (1.0 - _SpreadChanceDecay));
+    _StateMap[int2(tid.x, tid.y)] = float4(startTime, durationMul, newChance, newCooldown);
+}
+
+[numthreads(64, 1, 1)]
+void CSGridApplyNewFires(uint3 id : SV_DispatchThreadID)
+{
+    NewFireData nf = _NewFiresConsume.Consume();
+
+    int2 p = nf.pixel;
+    if (p.x < 0 || (uint)p.x >= _TextureWidth || p.y < 0 || (uint)p.y >= _TextureHeight) return;
+
+    float4 s = _StateMap[p];
+    if (s.r <= 0.0)
+    {
+        _StateMap[p] = float4(nf.startTime, nf.durationMul, nf.chance, nf.cooldownUntil);
+    }
+}
+
+[numthreads(1, 1, 1)]
+void CSSeedFire(uint3 id : SV_DispatchThreadID)
+{
+    int2 p = int2(_SeedPixelX, _SeedPixelY);
+    if (p.x < 0 || (uint)p.x >= _TextureWidth || p.y < 0 || (uint)p.y >= _TextureHeight) return;
+    _StateMap[p] = float4(_SeedStartTime, _SeedDurationMul, _SeedInitialChance, _SeedCooldownUntil);
+}
+
+// Clear a region of the state map
+[numthreads(8, 8, 1)]
+void CSClearStateMapRegion(uint3 tid : SV_DispatchThreadID)
+{
+    if (tid.x >= _TextureWidth || tid.y >= _TextureHeight) return;
+    
+    int x = (int)tid.x;
+    int y = (int)tid.y;
+    
+    // Check if pixel is within the clear region
+    if (x >= _ClearMinX && x <= _ClearMaxX && y >= _ClearMinY && y <= _ClearMaxY)
+    {
+        _StateMap[int2(x, y)] = float4(0, 0, 0, 0); // Zero = empty state
+    }
+}
+
+

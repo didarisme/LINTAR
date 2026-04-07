@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 7f5ef634221bc5b40833eee406b9b059
+ComputeShaderImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 343626
+  packageName: LeMi - Fire Spread
+  packageVersion: 1.1
+  assetPath: Assets/LemiGame/FireSpread/Runtime/Shaders/PathCull.compute
+  uploadId: 848770

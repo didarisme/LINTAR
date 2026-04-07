@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2decaec48132b234b92f441585278be1
+AssemblyDefinitionImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 343626
+  packageName: LeMi - Fire Spread
+  packageVersion: 1.1
+  assetPath: Assets/LemiGame/FireSpread/Runtime/FireVFX.FireSpread.Runtime.asmdef
+  uploadId: 848770

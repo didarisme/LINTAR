@@ -1,0 +1,93 @@
+// PathCull (Package)
+#pragma kernel CSFilter
+
+// Region map (RenderTexture) - marks circular regions
+Texture2D<float> _RegionMap;
+SamplerState sampler_LinearClamp;
+
+// Optional: height map (0..1)
+Texture2D<float> _HeightTex;
+int _UseHeightTex;     // 0/1
+float _HeightScale;    // world units
+float _HeightOffset;   // world units
+
+// Append visible points
+AppendStructuredBuffer<float3> VisiblePoints;
+
+uint _Width;
+uint _Height;
+float2 _OriginXZ;      // lower-left world (x,z)
+float2 _SizeXZ;        // world size (w, d)
+int _MirrorHeightX;    // 0/1 - mirror height map X axis
+int _MirrorHeightZ;    // 0/1 - mirror height map Z axis
+int _RotateHeightSteps; // 0=0°, 1=90°, 2=180°, 3=270°
+float _PixelStep;      // Pixel step for particle sampling (1.0 = 1 pixel per particle)
+
+// 8x8 thread group for convenient tiling
+[numthreads(8,8,1)]
+void CSFilter(uint3 tid : SV_DispatchThreadID)
+{
+    // Apply pixel step to reduce particle density
+    float fx = (float)tid.x * _PixelStep;
+    float fy = (float)tid.y * _PixelStep;
+    
+    // Skip if outside bounds
+    if (fx >= (float)_Width || fy >= (float)_Height) return;
+    
+    uint x = (uint)fx;
+    uint y = (uint)fy;
+    if (x >= _Width || y >= _Height) return;
+
+    // Base UV for region map (pixel center, v flipped to match FireSpread.compute)
+    // FireSpread uses: uv = float2((x + 0.5) / width, 1.0 - ((y + 0.5) / height))
+    float2 regionUV = float2((x + 0.5) / (float)_Width, 1.0 - ((y + 0.5) / (float)_Height));
+
+    // Check region map
+    float regionValue = _RegionMap.SampleLevel(sampler_LinearClamp, regionUV, 0);
+    if (regionValue < 0.5) return; // Not in any region
+
+    // Calculate world XZ coordinates (based on region map UV, no transform)
+    float wx = _OriginXZ.x + regionUV.x * _SizeXZ.x;
+    float wz = _OriginXZ.y + regionUV.y * _SizeXZ.y;
+
+    // Sample height map with transform
+    // Transform order: 1. Rotation, 2. Mirror
+    float wy = 0.0;
+    if (_UseHeightTex > 0)
+    {
+        // Start with base UV (not flipped, for height map coordinate system)
+        float2 baseUV = float2((x + 0.5) / (float)_Width, (y + 0.5) / (float)_Height);
+        
+        // Apply rotation first
+        float2 heightUV = baseUV;
+        if (_RotateHeightSteps == 1) // 90° clockwise
+        {
+            heightUV = float2(1.0 - baseUV.y, baseUV.x);
+        }
+        else if (_RotateHeightSteps == 2) // 180°
+        {
+            heightUV = float2(1.0 - baseUV.x, 1.0 - baseUV.y);
+        }
+        else if (_RotateHeightSteps == 3) // 270° clockwise (90° counter-clockwise)
+        {
+            heightUV = float2(baseUV.y, 1.0 - baseUV.x);
+        }
+        
+        // Apply mirroring
+        if (_MirrorHeightX > 0)
+        {
+            heightUV.x = 1.0 - heightUV.x;
+        }
+        if (_MirrorHeightZ > 0)
+        {
+            heightUV.y = 1.0 - heightUV.y;
+        }
+        
+        // Sample height map
+        float h = _HeightTex.SampleLevel(sampler_LinearClamp, heightUV, 0);
+        wy = h * _HeightScale + _HeightOffset;
+    }
+
+    // Append visible point
+    VisiblePoints.Append(float3(wx, wy, wz));
+}

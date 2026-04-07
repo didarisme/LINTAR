@@ -15,6 +15,7 @@ public class FireSimControlPanel : MonoBehaviour
     [Header("Input fields")]
     [SerializeField] private TMP_InputField speedField;
     [SerializeField] private TMP_InputField lifetimeField;
+    [SerializeField] private TMP_InputField offsetField;
 
     private void Start()
     {
@@ -24,9 +25,11 @@ public class FireSimControlPanel : MonoBehaviour
 
         speedField.onSubmit.AddListener(SetSpeed);
         lifetimeField.onSubmit.AddListener(SetLifeTime);
+        offsetField.onSubmit.AddListener(SetOffset);
 
-        UpdatePlaceHolder(speedField.placeholder as TMP_Text, fireSim.FireSpeed.ToString("F1"));
-        UpdatePlaceHolder(lifetimeField.placeholder as TMP_Text, fireSim.Lifetime.ToString());
+        UpdatePlaceHolder(speedField.placeholder as TMP_Text, fireSim.FireSpeed.ToString("F1") + " m/s");
+        UpdatePlaceHolder(lifetimeField.placeholder as TMP_Text, fireSim.Lifetime.ToString("F1") + " s");
+        UpdatePlaceHolder(offsetField.placeholder as TMP_Text, fireSim.YOffset.ToString("F1") + " m");
     }
 
     private void SetSpeed(string textValue)
@@ -34,7 +37,7 @@ public class FireSimControlPanel : MonoBehaviour
         if (float.TryParse(textValue, out float speed))
         {
             speed = fireSim.SetSpeed(speed);
-            UpdatePlaceHolder(speedField.placeholder as TMP_Text, speed.ToString());
+            UpdatePlaceHolder(speedField.placeholder as TMP_Text, speed.ToString("F1") + " m/s" );
 
             speedField.text = "";
         }
@@ -45,9 +48,20 @@ public class FireSimControlPanel : MonoBehaviour
         if (float.TryParse(textValue, out float lifeTime))
         {
             lifeTime = fireSim.SetLifetime(lifeTime);
-            UpdatePlaceHolder(lifetimeField.placeholder as TMP_Text, lifeTime.ToString());
+            UpdatePlaceHolder(lifetimeField.placeholder as TMP_Text, lifeTime.ToString("F1") + " s");
 
             lifetimeField.text = "";
+        }
+    }
+
+    private void SetOffset(string textValue)
+    {
+        if (float.TryParse(textValue, out float offset))
+        {
+            offset = fireSim.SetYOffset(offset);
+            UpdatePlaceHolder(offsetField.placeholder as TMP_Text, offset.ToString("F1") + " m");
+
+            offsetField.text = "";
         }
     }
 

@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 2386f6baaec5a764e87b791241dd63ee
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8574412962073106934
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 343626
+  packageName: LeMi - Fire Spread
+  packageVersion: 1.1
+  assetPath: Assets/LemiGame/FireSpread/Runtime/Demo/Terrain/TerrainLayer.terrainlayer
+  uploadId: 848770

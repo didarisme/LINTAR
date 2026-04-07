@@ -1,0 +1,16 @@
+{
+  "name": "LemiGame.FireSpread.Runtime",
+  "rootNamespace": "LemiGame",
+  "references": [
+    "LemiGame.Runtime"
+  ],
+  "includePlatforms": [],
+  "excludePlatforms": [],
+  "allowUnsafeCode": false,
+  "overrideReferences": false,
+  "precompiledReferences": [],
+  "autoReferenced": true,
+  "defineConstraints": [],
+  "versionDefines": []
+}
+

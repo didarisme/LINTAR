@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 128f010e685e677439f5f231cb289e95
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 343626
+  packageName: LeMi - Fire Spread
+  packageVersion: 1.1
+  assetPath: Assets/LemiGame/FireSpread/Runtime/Materials/UnlitBackground.mat
+  uploadId: 848770

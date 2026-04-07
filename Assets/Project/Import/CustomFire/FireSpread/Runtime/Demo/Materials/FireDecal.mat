@@ -1,0 +1,248 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &-4730116913168954079
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.RenderPipelines.Universal.Editor::UnityEditor.Rendering.Universal.AssetVersion
+  version: 10
+--- !u!114 &-4656628081112918209
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e73e2d5814a4454e979c7441abde7e4, type: 3}
+  m_Name: _DecalGradientHDRColor_GradientMeta
+  m_EditorClassIdentifier: LemiGame.Editor::LemiGame.Editor.GradientTextureMetadata
+  textureProperty: _DecalGradientHDRColor
+  hdr: 1
+  gradient:
+    serializedVersion: 2
+    key0: {r: 3.6226406, g: 0.3018867, b: 0, a: 0}
+    key1: {r: 0.047169805, g: 0.008463329, b: 0.0033374857, a: 1}
+    key2: {r: 0, g: 0, b: 0, a: 1}
+    key3: {r: 0, g: 0, b: 0, a: 0}
+    key4: {r: 0, g: 0, b: 0, a: 0}
+    key5: {r: 0, g: 0, b: 0, a: 0}
+    key6: {r: 0, g: 0, b: 0, a: 0}
+    key7: {r: 0, g: 0, b: 0, a: 0}
+    ctime0: 12728
+    ctime1: 27148
+    ctime2: 65535
+    ctime3: 0
+    ctime4: 0
+    ctime5: 0
+    ctime6: 0
+    ctime7: 0
+    atime0: 16587
+    atime1: 33241
+    atime2: 65535
+    atime3: 0
+    atime4: 0
+    atime5: 0
+    atime6: 0
+    atime7: 0
+    m_Mode: 0
+    m_ColorSpace: -1
+    m_NumColorKeys: 3
+    m_NumAlphaKeys: 3
+  gradientMode: 0
+--- !u!28 &-3573021402760907254
+Texture2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: _DecalGradientHDRColor_Gradient
+  m_ImageContentsHash:
+    serializedVersion: 2
+    Hash: 00000000000000000000000000000000
+  m_IsAlphaChannelOptional: 0
+  serializedVersion: 4
+  m_Width: 256
+  m_Height: 1
+  m_CompleteImageSize: 2048
+  m_MipsStripped: 0
+  m_TextureFormat: 17
+  m_MipCount: 1
+  m_IsReadable: 1
+  m_IsPreProcessed: 0
+  m_IgnoreMipmapLimit: 1
+  m_MipmapLimitGroupName: 
+  m_StreamingMipmaps: 0
+  m_StreamingMipmapsPriority: 0
+  m_VTOnly: 0
+  m_AlphaIsTransparency: 0
+  m_ImageCount: 1
+  m_TextureDimension: 2
+  m_TextureSettings:
+    serializedVersion: 2
+    m_FilterMode: 1
+    m_Aniso: 1
+    m_MipBias: 0
+    m_WrapU: 1
+    m_WrapV: 1
+    m_WrapW: 1
+  m_LightmapFormat: 0
+  m_ColorSpace: 0
+  m_PlatformBlob: 
+  image data: 2048
+  _typelessdata: 3f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000003f43d534000000002f43ca34da0100000f43b534c0050000ee42a034d3080000cd428a34c60a0000ad4275345c0c00008c425f34560d00006c424a344f0e00004b423434490f00002a421f34211000000a420a349e100000e941e8331b110000c841bd3397110000a841933314120000874168339112000067413d330e130000464112338a13411f2541e7320414c4250541bc324214dc28e44092328014d52ac3406732bf14672ca3403c32fd14642d824011323b15612e6240e6317a155e2f4140bb31b8152d3020409131f715ac30ff3f663135162a31be3f3b317316a9317d3f1031b21627323c3fe530f016a532fa3eba302e172433b93e90306d17a233783e6530ab171034373e3a30ea175034f53d0f3014188f34b43dc82f3318ce34733d732f52180d35313d1d2f71184c35f03cc72e91188c35af3c722eb018cb356e3c1c2ecf180a362c3cc62dee184936d63b712d0d198836543b1b2d2d19c836d13ac52c4c1907374f3a6f2c6b194637cc391a2c8a1985374a39882ba919c437c738dd2ac91902384538322ae819213885378629071a41388036db28261a61387b352f28451a803876340827641aa038e232b125841abf38d8305b24a31adf389b2d0822c21aff38062a5320d21a1e39fc294b20c61a3e39f1294420ba1a5d39e7293c20ae1a7d39dc293520a31a9d39d2292d20971abc39c82926208b1adc39bd291f20801afc39b3291720741a1b3aa9291020681a3b3a9e2908205c1a5a3a94290120511a7a3a8a29f31f451a9a3a7f29e41f391ab93a7529d51f2e1ad93a6b29c61f221af83a6029b81f161a183b5629a91f0a1a383b4c299a1fff19573b41298b1ff319773b37297c1fe719963b2d296d1fdc19b63b22295e1fd019d63b1829501fc419f53b0e29411fb819003c0329321fad19003cf928231fa119003cee28141f9519003ce428051f8a19003cda28f61e7e19003ccf28e81e7219003cc528d91e6619003cbb28ca1e5b19003cb028bb1e4f19003ca628ac1e4319003c9c289d1e3719003c91288e1e2c19003c8728801e2019003c7d28711e1419003c7228621e0919003c6828531efd18003c5e28441ef118003c5328351ee518003c4928261eda18003c3f28181ece18003c3428091ec218003c2a28fa1db718003c2028eb1dab18003c1528dc1d9f18003c0b28cd1d9318003c0028bf1d8818003cec27b01d7c18003cd827a11d7018003cc327921d6518003cae27831d5918003c9927741d4d18003c8527651d4118003c7027571d3618003c5b27481d2a18003c4727391d1e18003c32272a1d1318003c1d271b1d0718003c09270c1df617003cf426fd1cdf17003cdf26ef1cc817003cca26e01cb017003cb626d11c9917003ca126c21c8117003c8c26b31c6a17003c7826a41c5217003c6326951c3b17003c4e26871c2417003c3a26781c0c17003c2526691cf516003c10265a1cdd16003cfc254b1cc616003ce7253c1cae16003cd2252d1c9716003cbd251f1c8016003ca925101c6816003c9425011c5116003c7f25e41b3916003c6b25c61b2216003c5625a91b0a16003c41258b1bf315003c2d256d1bdc15003c1825501bc415003c0325321bad15003cee24141b9515003cda24f61a7e15003cc524d91a6615003cb024bb1a4f15003c9c249d1a3715003c8724801a2015003c7224621a0915003c5e24441af114003c4924261ada14003c3424091ac214003c2024eb19ab14003c0b24cd199314003cec23b0197c14003cc32392196514003c992374194d14003c702357193614003c472339191e14003c1d231b190714003cf422fd18df13003cca22e018b013003ca122c2188113003c7822a4185213003c4e2287182413003c25226918f512003cfc214b18c612003cd2212d189712003ca92110186812003c7f21e4173912003c5621a9170a12003c2d216d17dc11003c03213217ad11003cda20f6167e11003cb020bb164f11003c872080162011003c5e204416f110003c34200916c210003c0b20cd159310003cc31f92156510003c701f57153610003c1d1f1b150710003cca1ee014b00f003c781ea414520f003c251e6914f50e003cd21d2d14970e003c7f1de413390e003c2d1d6d13dc0d003cda1cf6127e0d003c871c8012200d003c341c0912c20c003cc31b9211650c003c1d1b1b11070c003c781aa410520b003cd2192d10970a003c2d196d0fdc09003c8718800e2009003cc317920d6508003c7816a40c5207003c2d156d0bdc05003cc31392096504003c2d116d07ee02003c2d0db7037701003c000000000000003c
+  m_StreamData:
+    serializedVersion: 2
+    offset: 0
+    size: 0
+    path: 
+--- !u!21 &2100000
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: FireDecal
+  m_Shader: {fileID: -6465566751694194690, guid: 5d1b00cef612f114389adbba37e6ba87, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - Base_Map:
+        m_Texture: {fileID: 2800000, guid: 1124481fc5780cc4cb447bed05f17cc9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - Normal_Map:
+        m_Texture: {fileID: 2800000, guid: 1124481fc5780cc4cb447bed05f17cc9, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BumpMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _BurnMap:
+        m_Texture: {fileID: 8400000, guid: 8da34f83641e09845baaca7bdbaee084, type: 2}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DecalGradientHDRColor:
+        m_Texture: {fileID: -3573021402760907254}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailAlbedoMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailMask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _DetailNormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _EmissionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MetallicGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _OcclusionMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _ParallaxMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - Normal_Blend: 0
+    - _AddPrecomputedVelocity: 0
+    - _AlphaClip: 0
+    - _AlphaToMask: 0
+    - _Blend: 0
+    - _BlendModePreserveSpecular: 1
+    - _BumpScale: 1
+    - _ClearCoatMask: 0
+    - _ClearCoatSmoothness: 0
+    - _Cull: 2
+    - _Cutoff: 0.5
+    - _DecalMeshBiasType: 0
+    - _DecalMeshDepthBias: 0
+    - _DecalMeshViewBias: 0
+    - _DetailAlbedoMapScale: 1
+    - _DetailNormalMapScale: 1
+    - _DrawOrder: 0
+    - _DstBlend: 0
+    - _DstBlendAlpha: 0
+    - _EnvironmentReflections: 1
+    - _GlossMapScale: 0
+    - _Glossiness: 0
+    - _GlossyReflections: 0
+    - _Metallic: 0
+    - _OcclusionStrength: 1
+    - _Parallax: 0.005
+    - _QueueOffset: 0
+    - _ReceiveShadows: 1
+    - _Smoothness: 0.5
+    - _SmoothnessTextureChannel: 0
+    - _SpecularHighlights: 1
+    - _SrcBlend: 1
+    - _SrcBlendAlpha: 1
+    - _Surface: 0
+    - _WorkflowMode: 1
+    - _XRMotionVectorsPass: 1
+    - _ZWrite: 1
+    m_Colors:
+    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
+    - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1

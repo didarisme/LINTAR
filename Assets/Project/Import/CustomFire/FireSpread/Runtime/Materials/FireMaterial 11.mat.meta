@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 4c2c1ad0830b2404a9e3965fac24190b
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 343626
+  packageName: LeMi - Fire Spread
+  packageVersion: 1.1
+  assetPath: Assets/LemiGame/FireSpread/Runtime/Materials/FireMaterial 11.mat
+  uploadId: 848770

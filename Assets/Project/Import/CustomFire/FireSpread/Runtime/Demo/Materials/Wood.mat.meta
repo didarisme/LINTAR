@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 562cac86bad017f47835d4da90c92af8
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 343626
+  packageName: LeMi - Fire Spread
+  packageVersion: 1.1
+  assetPath: Assets/LemiGame/FireSpread/Runtime/Demo/Materials/Wood.mat
+  uploadId: 848770

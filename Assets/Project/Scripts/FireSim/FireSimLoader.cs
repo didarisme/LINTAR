@@ -7,13 +7,13 @@ using UnityEngine;
 public class FireSimLoader : MonoBehaviour
 {
     [Header("File")]
-    [SerializeField] private FireScenarioSelectionSO fireScenario;
+    [SerializeField] private FireScenarioSelectorSO fireScenario;
 
     public event Action<FireSimConfig> OnDataLoaded;
 
     private void Start()
     {
-        if (fireScenario == null || fireScenario.SelectedScenario == null)
+        if (fireScenario == null || fireScenario.SelectedScenarioPath == null)
         {
             Debug.LogError("Fire scenario not selected!");
             return;
@@ -24,7 +24,13 @@ public class FireSimLoader : MonoBehaviour
 
     private void LoadFile()
     {
-        TextAsset fireFile = fireScenario.SelectedScenario;
+        string path = fireScenario.SelectedScenarioPath;
+
+        if (!System.IO.File.Exists(path))
+        {
+            Debug.LogError("File not found: " + path);
+            return;
+        }
 
         var fireData = new Dictionary<int, List<Vector2Int>>();
 
@@ -34,7 +40,7 @@ public class FireSimLoader : MonoBehaviour
         float centerPx = 0f, centerPy = 0f;
         int maxTick = 0;
 
-        string[] lines = fireFile.text.Split('\n');
+        string[] lines = System.IO.File.ReadAllLines(path);
 
         foreach (string line in lines)
         {

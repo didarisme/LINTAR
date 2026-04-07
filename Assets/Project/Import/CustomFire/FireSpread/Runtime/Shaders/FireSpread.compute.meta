@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: c6f8d128aa8c2ac4193cb0f1db84deed
+ComputeShaderImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 343626
+  packageName: LeMi - Fire Spread
+  packageVersion: 1.1
+  assetPath: Assets/LemiGame/FireSpread/Runtime/Shaders/FireSpread.compute
+  uploadId: 848770

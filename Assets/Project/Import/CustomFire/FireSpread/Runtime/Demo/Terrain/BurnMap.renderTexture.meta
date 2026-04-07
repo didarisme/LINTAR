@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 8da34f83641e09845baaca7bdbaee084
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 8400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 343626
+  packageName: LeMi - Fire Spread
+  packageVersion: 1.1
+  assetPath: Assets/LemiGame/FireSpread/Runtime/Demo/Terrain/BurnMap.renderTexture
+  uploadId: 848770
