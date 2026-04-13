@@ -1346,22 +1346,8 @@ namespace LemiGame
                 if (burnMap == null) continue;
                 if (monitoredColliders.Count == 0) continue;
 
-                // Performance optimization: Skip expensive cache update if no active fires
-                if (activeFirePixels.Count == 0)
-                {
-                    // Clear any previous fire states since there are no fires
-                    foreach (var col in monitoredColliders)
-                    {
-                        if (col == null) continue;
-                        if (colliderInFire.TryGetValue(col, out var wasOnFire) && wasOnFire)
-                        {
-                            colliderInFire[col] = false;
-                            OnFireExit?.Invoke(col);
-                        }
-                    }
-                    continue;
-                }
-
+                // Must sample burn map whenever colliders are monitored. CA mode does not fill
+                // activeFirePixels (see StartFireAt); skipping here prevented Enter/Stay/Exit entirely.
                 // Update CPU cache (expensive GPU->CPU transfer, frequency reduced via detectionUpdateInterval)
                 UpdateBurnMapCache();
 
