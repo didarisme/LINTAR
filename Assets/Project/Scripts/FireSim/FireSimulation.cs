@@ -28,12 +28,11 @@ public class FireSimulation : MonoBehaviour
     private float tickDuration = 0.05f;
 
     private HashSet<Vector2Int> burntSet = new();
-    private List<FireInstance> fireInstances = new();
-
     private List<FireInstance> pendingVfxSpawns = new();
 
-    private int currentTick;
+    public List<FireInstance> FireInstances { get; private set; } = new();
 
+    private int currentTick;
     private bool started = false;
 
     public float FireSpeed => fireSpeed;
@@ -158,7 +157,7 @@ public class FireSimulation : MonoBehaviour
             position = groundPos
         };
 
-        fireInstances.Add(fire);
+        FireInstances.Add(fire);
         pendingVfxSpawns.Add(fire);
     }
 
@@ -206,7 +205,7 @@ public class FireSimulation : MonoBehaviour
         pendingVfxSpawns.Clear();
     }
 
-    private class FireInstance
+    public class FireInstance
     {
         public int startTick;
         public Vector3 position;
