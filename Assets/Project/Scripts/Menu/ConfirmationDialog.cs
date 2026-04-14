@@ -7,17 +7,16 @@ public class ConfirmationDialog : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private TextMeshProUGUI _messageText;
-    [SerializeField] private Button          _btnYes;
-    [SerializeField] private Button          _btnNo;
+    [SerializeField] private Button _btnYes;
+    [SerializeField] private Button _btnNo;
 
     private Action _onConfirm;
 
     private void Awake()
-{
-    _btnYes.onClick.AddListener(OnYes);
-    _btnNo.onClick.AddListener(OnNo);
-
-}
+    {
+        _btnYes.onClick.AddListener(OnYes);
+        _btnNo.onClick.AddListener(OnNo);
+    }
 
     public void Show(string simulationName, Action onConfirm)
     {

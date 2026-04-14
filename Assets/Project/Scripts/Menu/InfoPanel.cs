@@ -13,51 +13,54 @@ public class InfoPanel : Pageable
     private int _activePage = 0;
     private Coroutine _fadeCoroutine;
 
-   public override void OnOpen()
+    private void Awake()
     {
-    infoPanel.SetActive(true);
-    _activePage = -1;
-
-    foreach (GameObject page in pages)
-    {
-        page.SetActive(false);
-        GetCanvasGroup(page).alpha = 1f;
+        foreach (GameObject page in pages)
+        {
+            page.SetActive(false);
+            GetCanvasGroup(page).alpha = 1f;
+        }
     }
 
-    OpenPage(0);
+    public override void OnOpen()
+    {
+        infoPanel.SetActive(true);
+        _activePage = -1;
+
+        OpenPageByIndex(0);
     }
 
-public override void OnClose()
+    public override void OnClose()
     {
-    if (_fadeCoroutine != null)
-    {
-        StopCoroutine(_fadeCoroutine);
-        _fadeCoroutine = null;
+        if (_fadeCoroutine != null)
+        {
+            StopCoroutine(_fadeCoroutine);
+            _fadeCoroutine = null;
+        }
+
+        infoPanel.SetActive(false);
     }
 
-    infoPanel.SetActive(false);
-    }
-
-    public void OpenPage(int pageIndex)
+    public void OpenPageByIndex(int pageIndex)
     {
-    if (pages == null || pages.Length == 0) return;
+        if (pages == null || pages.Length == 0) return;
 
-    for (int i = 0; i < navButtons.Length; i++)
-        navButtons[i].SetActive(i == pageIndex);
+        for (int i = 0; i < navButtons.Length; i++)
+            navButtons[i].SetActiveColor(i == pageIndex);
 
-    if (_activePage == -1)
-    {
-        _activePage = pageIndex;
-        pages[pageIndex].SetActive(true);
-        return;
-    }
+        if (_activePage == -1)
+        {
+            _activePage = pageIndex;
+            pages[pageIndex].SetActive(true);
+            return;
+        }
 
-    if (pageIndex == _activePage && pages[_activePage].activeSelf) return;
+        if (pageIndex == _activePage && pages[_activePage].activeSelf) return;
 
-    if (_fadeCoroutine != null)
-        StopCoroutine(_fadeCoroutine);
+        if (_fadeCoroutine != null)
+            StopCoroutine(_fadeCoroutine);
 
-    _fadeCoroutine = StartCoroutine(FadePage(_activePage, pageIndex));
+        _fadeCoroutine = StartCoroutine(FadePage(_activePage, pageIndex));
     }
 
     private IEnumerator FadePage(int fromIndex, int toIndex)
@@ -81,8 +84,8 @@ public override void OnClose()
 
         while (elapsed < fadeDuration)
         {
-            elapsed  += Time.deltaTime;
-            cg.alpha  = Mathf.Lerp(from, to, elapsed / fadeDuration);
+            elapsed += Time.deltaTime;
+            cg.alpha = Mathf.Lerp(from, to, elapsed / fadeDuration);
             yield return null;
         }
 

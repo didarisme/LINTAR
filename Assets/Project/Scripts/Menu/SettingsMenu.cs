@@ -19,21 +19,19 @@ public class SettingsMenu : Pageable
 
     private List<Resolution> _uniqueResolutions = new List<Resolution>();
     private readonly int[] _fpsOptions = { 30, 60, 120, 144, -1 };
-    private bool _initialized       = false;
+
+    private void Awake()
+    {
+        InitResolutions();
+        InitQuality();
+        InitVSync();
+        InitFullscreen();
+        InitFPS();
+    }
 
     public override void OnOpen()
     {
         settingsPanel.SetActive(true);
-
-        if (!_initialized)
-        {
-            InitResolutions();
-            InitQuality();
-            InitVSync();
-            InitFullscreen();
-            InitFPS();
-            _initialized = true;
-        }
     }
 
     public override void OnClose()
@@ -47,9 +45,9 @@ public class SettingsMenu : Pageable
 
         resolutionDropdown.ClearOptions();
 
-        List<string>    options = new List<string>();
-        HashSet<string> seen    = new HashSet<string>();
-        int currentIndex        = 0;
+        List<string> options = new List<string>();
+        HashSet<string> seen = new HashSet<string>();
+        int currentIndex = 0;
 
         foreach (Resolution r in all)
         {
@@ -60,7 +58,7 @@ public class SettingsMenu : Pageable
             _uniqueResolutions.Add(r);
             options.Add(r.width + " × " + r.height);
 
-            if (r.width  == Screen.currentResolution.width &&
+            if (r.width == Screen.currentResolution.width &&
                 r.height == Screen.currentResolution.height)
                 currentIndex = _uniqueResolutions.Count - 1;
         }
@@ -82,9 +80,9 @@ public class SettingsMenu : Pageable
 
     private void InitVSync()
     {
-    vsyncToggle.isOn = QualitySettings.vSyncCount > 0;
-    vsyncToggle.onValueChanged.AddListener(SetVSync);
-    fpsDropdown.interactable = QualitySettings.vSyncCount == 0;
+        vsyncToggle.isOn = QualitySettings.vSyncCount > 0;
+        vsyncToggle.onValueChanged.AddListener(SetVSync);
+        fpsDropdown.interactable = QualitySettings.vSyncCount == 0;
     }
 
     private void InitFullscreen()
@@ -122,18 +120,18 @@ public class SettingsMenu : Pageable
 
     public void SetQuality(int index)
     {
-    int userVSync = QualitySettings.vSyncCount;
+        int userVSync = QualitySettings.vSyncCount;
 
-    QualitySettings.SetQualityLevel(index, true);
-    QualitySettings.vSyncCount = userVSync;
-    vsyncToggle.isOn = userVSync > 0;
+        QualitySettings.SetQualityLevel(index, true);
+        QualitySettings.vSyncCount = userVSync;
+        vsyncToggle.isOn = userVSync > 0;
     }
 
     public void SetVSync(bool enabled)
     {
-    QualitySettings.vSyncCount = enabled ? 1 : 0;
-    
-    fpsDropdown.interactable = !enabled;
+        QualitySettings.vSyncCount = enabled ? 1 : 0;
+        
+        fpsDropdown.interactable = !enabled;
     }
 
     public void SetFullscreen(bool isFullscreen)

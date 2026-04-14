@@ -31,17 +31,12 @@ public class UploadSimulation : Pageable
 
     private void Start()
     {
-        if (!_initialized)
-        {
-            Initialize();
-            _initialized = true;
-        }
+        Initialize();
     }
 
     public override void OnOpen()
     {
         uploadPanel.SetActive(true);
-
         ResetUI();
     }
 
@@ -53,6 +48,8 @@ public class UploadSimulation : Pageable
 
     private void Initialize()
     {
+        if (!_initialized) return;
+
         _targetFolder = Path.Combine(Application.streamingAssetsPath, "FireScenarios");
 
         if (!Directory.Exists(_targetFolder))
@@ -62,6 +59,8 @@ public class UploadSimulation : Pageable
         continueButton.onClick.AddListener(OnContinuePressed);
         uploadAnotherBtn.onClick.AddListener(OnUploadAnother);
         btnGoToSims.onClick.AddListener(OnGoToSims);
+
+        _initialized = true;
     }
 
     private void ResetUI()

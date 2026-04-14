@@ -1665,7 +1665,7 @@ GameObject:
   - component: {fileID: 453956047}
   - component: {fileID: 453956046}
   m_Layer: 5
-  m_Name: OptionRow
+  m_Name: BurntZoneOption
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -5926,9 +5926,9 @@ RectTransform:
   - {fileID: 2078659649}
   - {fileID: 868643364}
   - {fileID: 716980828}
+  - {fileID: 453956045}
   - {fileID: 1721576442}
   - {fileID: 1096607813}
-  - {fileID: 453956045}
   m_Father: {fileID: 1420292292}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
