@@ -48,7 +48,7 @@ public class UploadSimulation : Pageable
 
     private void Initialize()
     {
-        if (!_initialized) return;
+        if (_initialized) return;
 
         _targetFolder = Path.Combine(Application.streamingAssetsPath, "FireScenarios");
 

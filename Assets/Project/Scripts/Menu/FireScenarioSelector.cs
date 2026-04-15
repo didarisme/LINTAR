@@ -69,6 +69,14 @@ public class FireScenarioSelector : Pageable
 
     private void ResetSelection()
     {
+        if (_selectedButton != null)
+        {
+            Image img = _selectedButton.GetComponent<Image>();
+            if (img != null)
+            {
+                img.color = normalColor;
+            }
+        }
         _selectedFilePath = null;
         _selectedButton = null;
         continueButton.interactable = false;
