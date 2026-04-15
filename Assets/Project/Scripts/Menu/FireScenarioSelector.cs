@@ -43,9 +43,20 @@ public class FireScenarioSelector : Pageable
         continueButton.interactable = false;
         continueButton.onClick.AddListener(OnContinuePressed);
     }
+    private void AnimateAllButtons()
+    {
+        int index = 0;
+        foreach (Transform child in contentParent)
+        {
+            StartCoroutine(AnimateEntry(child.gameObject, index));
+            index++;
+        }
+    }
 
     public override void OnOpen()
     {
+        StopAllCoroutines(); 
+
         chooseSimPanel.SetActive(true);
 
         if (!_initialized)
@@ -57,6 +68,8 @@ public class FireScenarioSelector : Pageable
         {
             RefreshSimulations();
         }
+
+        AnimateAllButtons();
 
         ResetSelection();
         ResetScrollPosition();
@@ -154,8 +167,6 @@ public class FireScenarioSelector : Pageable
         SetupDeleteButton(btn, filePath, fileName);
 
         _buttons[filePath] = btn;
-
-        StartCoroutine(AnimateEntry(btn, index));
     }
 
     private void SetupDeleteButton(GameObject btn, string filePath, string fileName)
@@ -241,13 +252,14 @@ public class FireScenarioSelector : Pageable
         Destroy(btn);
     }
 
-    // ========================
     // ENTRY ANIMATION
-    // ========================
-
     private IEnumerator AnimateEntry(GameObject btn, int index)
     {
-        CanvasGroup cg = btn.AddComponent<CanvasGroup>();
+        if (!btn.TryGetComponent<CanvasGroup>(out CanvasGroup cg))
+        {
+            cg = btn.AddComponent<CanvasGroup>();
+        }
+
         RectTransform rect = btn.GetComponent<RectTransform>();
 
         cg.alpha = 0f;
@@ -273,10 +285,7 @@ public class FireScenarioSelector : Pageable
         rect.localScale = Vector3.one;
     }
 
-    // ========================
     // CONTINUE
-    // ========================
-
     private void OnContinuePressed()
     {
         if (_selectedFilePath == null) return;
