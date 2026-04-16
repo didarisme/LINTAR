@@ -7,6 +7,7 @@ public class FireSimControlPanel : MonoBehaviour
 {
     [SerializeField] private FireSimulation fireSim;
     [SerializeField] private BurntZoneRenderer burntRenderer;
+    [SerializeField] private GameObject uiRoot;
 
     [Header("Buttons")]
     [SerializeField] private Button reloadBtn;
@@ -20,8 +21,13 @@ public class FireSimControlPanel : MonoBehaviour
     [SerializeField] private TMP_InputField burntSizeField;
     [SerializeField] private TMP_InputField burntOffsetField;
 
+    private PlayerInputActions input;
+    private bool visible = true;
+
     private void Start()
     {
+        input = InputAccess.Instance.Input;
+
         launchBtn.onClick.AddListener(OnLaunchButton);
         reloadBtn.onClick.AddListener(OnReloadButton);
         exitBtn.onClick.AddListener(OnExitButton);
@@ -38,6 +44,15 @@ public class FireSimControlPanel : MonoBehaviour
         UpdatePlaceHolder(offsetField.placeholder as TMP_Text, fireSim.YOffset.ToString("F1") + " m");
         UpdatePlaceHolder(burntSizeField.placeholder as TMP_Text, burntRenderer.MeshSize.ToString("F1") + " m");
         UpdatePlaceHolder(burntOffsetField.placeholder as TMP_Text, burntRenderer.YOffset.ToString("F1") + " m");
+    }
+
+    private void Update()
+    {
+        if (input.Gameplay.ToggleUI.WasPressedThisFrame())
+        {
+            visible = !visible;
+            uiRoot.SetActive(visible);
+        }
     }
 
     private void SetSpeed(string textValue)

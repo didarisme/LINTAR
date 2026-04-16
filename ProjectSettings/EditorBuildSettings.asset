@@ -11,5 +11,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Project/Scenes/CesiumShowcase.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
-  m_configObjects: {}
+  m_configObjects:
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 28afe973535992c4e98b789b8902379d, type: 3}
   m_UseUCBPForAssetBundles: 0

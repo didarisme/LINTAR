@@ -3,51 +3,64 @@ using UnityEngine;
 
 public class CameraSwitcher : MonoBehaviour
 {
-    [SerializeField] private ViewCamera[] cameras;
     [SerializeField] private TextMeshProUGUI cameraText;
+    [SerializeField] private ViewCamera[] cameras;
 
+    private PlayerInputActions input;
+    private FreeFlyCamera freeFlyCamera;
     private Camera activeCamera;
-    private int currentIndex = 0;
+
+    private int currentIndex;
 
     private void Start()
     {
+        input = InputAccess.Instance.Input;
+
         ActivateCamera(0);
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
+        if (input.Gameplay.NextCamera.WasPressedThisFrame())
             NextCamera();
-        }
 
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
+        if (input.Gameplay.PrevCamera.WasPressedThisFrame())
             PreviousCamera();
-        }
     }
 
-    public void NextCamera()
+    private void NextCamera()
     {
         currentIndex = (currentIndex + 1) % cameras.Length;
         ActivateCamera(currentIndex);
     }
 
-    public void PreviousCamera()
+    private void PreviousCamera()
     {
         currentIndex = (currentIndex - 1 + cameras.Length) % cameras.Length;
         ActivateCamera(currentIndex);
     }
 
-    public void ActivateCamera(int cameraIndex)
+    private void ActivateCamera(int index)
     {
         if (activeCamera != null)
             activeCamera.enabled = false;
 
-        activeCamera = cameras[cameraIndex].viewCamera;
+        activeCamera = cameras[index].viewCamera;
         activeCamera.enabled = true;
 
-        cameraText.text = cameras[cameraIndex].cameraName;
+        if (freeFlyCamera != null)
+        {
+            freeFlyCamera.SetCameraActive(false);
+            freeFlyCamera = null;
+        }
+
+        if (activeCamera.TryGetComponent(out FreeFlyCamera fly))
+        {
+            freeFlyCamera = fly;
+            freeFlyCamera.SetCameraActive(true);
+        }
+
+        cameraText.text = cameras[index].cameraName;
     }
 
     [System.Serializable]
@@ -55,5 +68,6 @@ public class CameraSwitcher : MonoBehaviour
     {
         public string cameraName;
         public Camera viewCamera;
+        public bool isFly;
     }
 }

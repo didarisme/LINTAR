@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using TMPro;
 using UnityEngine.SceneManagement;
 
-public class FireScenarioSelector : Pageable
+public class ScenarioSelector : Pageable
 {
     [SerializeField] private FireScenarioSelectorSO fireScenario;
 
@@ -19,8 +19,8 @@ public class FireScenarioSelector : Pageable
     [SerializeField] private ScrollRect scrollRect;
 
     [Header("Colors")]
-    [SerializeField] private Color normalColor = new Color(0.12f, 0.12f, 0.16f);
-    [SerializeField] private Color selectedColor = new Color(0.25f, 0.35f, 0.7f);
+    [SerializeField] private Color normalColor = new(0.12f, 0.12f, 0.16f);
+    [SerializeField] private Color selectedColor = new(0.25f, 0.35f, 0.7f);
 
     [Header("Animation")]
     [SerializeField] private float entryDuration = 0.3f;
@@ -29,12 +29,10 @@ public class FireScenarioSelector : Pageable
     [SerializeField] private float exitDuration = 0.2f;
 
     private string _folderPath;
-
-    private string _selectedFilePath;
+    private string _selectedScenarioPath;
     private GameObject _selectedButton;
 
-    private Dictionary<string, GameObject> _buttons = new();
-    private bool _initialized = false;
+    private readonly Dictionary<string, GameObject> _buttons = new();
 
     private void Awake()
     {
@@ -43,65 +41,28 @@ public class FireScenarioSelector : Pageable
         continueButton.interactable = false;
         continueButton.onClick.AddListener(OnContinuePressed);
     }
-    private void AnimateAllButtons()
-    {
-        int index = 0;
-        foreach (Transform child in contentParent)
-        {
-            StartCoroutine(AnimateEntry(child.gameObject, index));
-            index++;
-        }
-    }
 
     public override void OnOpen()
     {
-        StopAllCoroutines(); 
-
         chooseSimPanel.SetActive(true);
 
-        if (!_initialized)
-        {
-            LoadSimulationsInitial();
-            _initialized = true;
-        }
-        else
-        {
-            RefreshSimulations();
-        }
-
+        LoadSimulations();
         AnimateAllButtons();
-
-        ResetSelection();
-        ResetScrollPosition();
     }
 
     public override void OnClose()
     {
         chooseSimPanel.SetActive(false);
+        ResetSelection();
+        ResetScrollPosition();
+
+        StopAllCoroutines();
     }
 
-    private void ResetSelection()
-    {
-        if (_selectedButton != null)
-        {
-            Image img = _selectedButton.GetComponent<Image>();
-            if (img != null)
-            {
-                img.color = normalColor;
-            }
-        }
-        _selectedFilePath = null;
-        _selectedButton = null;
-        continueButton.interactable = false;
-    }
-
-    private void ResetScrollPosition()
-    {
-        scrollRect.verticalNormalizedPosition = 1f;
-        scrollRect.velocity = Vector2.zero;
-    }
-
-    private void LoadSimulationsInitial()
+    // =========================
+    // LOAD (объединённый метод)
+    // =========================
+    private void LoadSimulations()
     {
         if (!Directory.Exists(_folderPath))
         {
@@ -110,30 +71,18 @@ public class FireScenarioSelector : Pageable
         }
 
         string[] files = Directory.GetFiles(_folderPath, "*.txt");
-
-        for (int i = 0; i < files.Length; i++)
-        {
-            CreateButton(files[i], i);
-        }
-    }
-
-    private void RefreshSimulations()
-    {
-        if (!Directory.Exists(_folderPath)) return;
-
-        string[] files = Directory.GetFiles(_folderPath, "*.txt");
         HashSet<string> currentFiles = new(files);
 
-        int index = _buttons.Count;
-
+        // Добавляем новые
         foreach (var file in files)
         {
             if (!_buttons.ContainsKey(file))
             {
-                CreateButton(file, index++);
+                CreateButton(file);
             }
         }
 
+        // Удаляем отсутствующие
         var toRemove = new List<string>();
 
         foreach (var kvp in _buttons)
@@ -151,18 +100,17 @@ public class FireScenarioSelector : Pageable
         }
     }
 
-    private void CreateButton(string filePath, int index)
+    private void CreateButton(string filePath)
     {
         string fileName = Path.GetFileNameWithoutExtension(filePath);
 
         GameObject btn = Instantiate(simButtonPrefab, contentParent);
 
         btn.GetComponentInChildren<TextMeshProUGUI>().text = fileName;
+        btn.GetComponent<Image>().color = normalColor;
 
-        Image img = btn.GetComponent<Image>();
-        img.color = normalColor;
-
-        btn.GetComponent<Button>().onClick.AddListener(() => SelectSimulation(filePath, btn));
+        btn.GetComponent<Button>()
+            .onClick.AddListener(() => SelectSimulation(filePath, btn));
 
         SetupDeleteButton(btn, filePath, fileName);
 
@@ -172,33 +120,86 @@ public class FireScenarioSelector : Pageable
     private void SetupDeleteButton(GameObject btn, string filePath, string fileName)
     {
         Transform deleteTransform = btn.transform.Find("DeleteBtn");
-
         if (deleteTransform == null) return;
 
-        if (!deleteTransform.TryGetComponent<Button>(out Button deleteBtn)) return;
+        if (!deleteTransform.TryGetComponent(out Button deleteBtn)) return;
 
         deleteBtn.onClick.AddListener(() =>
             confirmationDialog.Show(fileName, () =>
                 DeleteSimulation(filePath, btn)));
     }
 
+    // =========================
+    // SELECTION
+    // =========================
     private void SelectSimulation(string path, GameObject btn)
     {
         if (_selectedButton != null)
         {
-            Image prevImg = _selectedButton.GetComponent<Image>();
-            StartCoroutine(AnimateColor(prevImg, normalColor));
+            StartCoroutine(AnimateColor(
+                _selectedButton.GetComponent<Image>(),
+                normalColor));
         }
 
-        _selectedFilePath = path;
+        _selectedScenarioPath = path;
         _selectedButton = btn;
 
-        Image img = btn.GetComponent<Image>();
-        StartCoroutine(AnimateColor(img, selectedColor));
+        StartCoroutine(AnimateColor(
+            btn.GetComponent<Image>(),
+            selectedColor));
 
         continueButton.interactable = true;
     }
 
+    // =========================
+    // DELETE
+    // =========================
+    private void DeleteSimulation(string filePath, GameObject btn)
+    {
+        if (File.Exists(filePath))
+            File.Delete(filePath);
+
+        if (_selectedScenarioPath == filePath)
+            ResetSelection();
+
+        _buttons.Remove(filePath);
+
+        StartCoroutine(AnimateExit(btn));
+    }
+
+    // =========================
+    // UI HELPERS
+    // =========================
+    private void ResetSelection()
+    {
+        if (_selectedButton != null)
+        {
+            _selectedButton.GetComponent<Image>().color = normalColor;
+        }
+
+        _selectedScenarioPath = null;
+        _selectedButton = null;
+        continueButton.interactable = false;
+    }
+
+    private void ResetScrollPosition()
+    {
+        scrollRect.verticalNormalizedPosition = 1f;
+        scrollRect.velocity = Vector2.zero;
+    }
+
+    private void AnimateAllButtons()
+    {
+        int index = 0;
+        foreach (Transform child in contentParent)
+        {
+            StartCoroutine(AnimateEntry(child.gameObject, index++));
+        }
+    }
+
+    // =========================
+    // ANIMATIONS
+    // =========================
     private IEnumerator AnimateColor(Image img, Color target)
     {
         Color start = img.color;
@@ -214,51 +215,10 @@ public class FireScenarioSelector : Pageable
         img.color = target;
     }
 
-    private void DeleteSimulation(string filePath, GameObject btn)
-    {
-        if (File.Exists(filePath))
-            File.Delete(filePath);
-
-        if (_selectedFilePath == filePath)
-        {
-            ResetSelection();
-        }
-
-        _buttons.Remove(filePath);
-
-        StartCoroutine(AnimateExit(btn));
-    }
-
-    private IEnumerator AnimateExit(GameObject btn)
-    {
-        CanvasGroup cg = btn.GetComponent<CanvasGroup>();
-        if (cg == null) cg = btn.AddComponent<CanvasGroup>();
-
-        btn.GetComponent<Button>().interactable = false;
-
-        float elapsed = 0f;
-
-        while (elapsed < exitDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / exitDuration);
-
-            cg.alpha = 1f - t;
-            btn.transform.localScale = Vector3.Lerp(Vector3.one, Vector3.one * 0.85f, t);
-
-            yield return null;
-        }
-
-        Destroy(btn);
-    }
-
-    // ENTRY ANIMATION
     private IEnumerator AnimateEntry(GameObject btn, int index)
     {
-        if (!btn.TryGetComponent<CanvasGroup>(out CanvasGroup cg))
-        {
+        if (!btn.TryGetComponent(out CanvasGroup cg))
             cg = btn.AddComponent<CanvasGroup>();
-        }
 
         RectTransform rect = btn.GetComponent<RectTransform>();
 
@@ -272,11 +232,10 @@ public class FireScenarioSelector : Pageable
         while (elapsed < entryDuration)
         {
             elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / entryDuration);
-            float smooth = Mathf.SmoothStep(0f, 1f, t);
+            float t = Mathf.SmoothStep(0f, 1f, elapsed / entryDuration);
 
-            cg.alpha = smooth;
-            rect.localScale = Vector3.Lerp(Vector3.one * 0.85f, Vector3.one, smooth);
+            cg.alpha = t;
+            rect.localScale = Vector3.Lerp(Vector3.one * 0.85f, Vector3.one, t);
 
             yield return null;
         }
@@ -285,13 +244,37 @@ public class FireScenarioSelector : Pageable
         rect.localScale = Vector3.one;
     }
 
+    private IEnumerator AnimateExit(GameObject btn)
+    {
+        if (!btn.TryGetComponent(out CanvasGroup cg))
+            cg = btn.AddComponent<CanvasGroup>();
+
+        btn.GetComponent<Button>().interactable = false;
+
+        float elapsed = 0f;
+
+        while (elapsed < exitDuration)
+        {
+            elapsed += Time.deltaTime;
+            float t = elapsed / exitDuration;
+
+            cg.alpha = 1f - t;
+            btn.transform.localScale = Vector3.Lerp(Vector3.one, Vector3.one * 0.85f, t);
+
+            yield return null;
+        }
+
+        Destroy(btn);
+    }
+
+    // =========================
     // CONTINUE
+    // =========================
     private void OnContinuePressed()
     {
-        if (_selectedFilePath == null) return;
+        if (_selectedScenarioPath == null) return;
 
-        fireScenario.SelectedScenarioPath = _selectedFilePath;
-
+        fireScenario.SelectedScenarioPath = _selectedScenarioPath;
         SceneManager.LoadScene("CesiumShowcase");
     }
 }
