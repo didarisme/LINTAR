@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class MainMenuController : MonoBehaviour
 {
-    [SerializeField] private GameObject mainMenuPanel;
+    [SerializeField] private Pageable mainMenuPage;
 
     [SerializeField] private Pageable chooseSimPage;
     [SerializeField] private Pageable uploadSimPage;
@@ -10,6 +10,11 @@ public class MainMenuController : MonoBehaviour
     [SerializeField] private Pageable infoPage;
 
     private Pageable currentPanel;
+
+    private void Start()
+    {
+        mainMenuPage.Open();
+    }
 
     public void OpenChooseSim()
     {
@@ -40,24 +45,19 @@ public class MainMenuController : MonoBehaviour
     {
         if (newPage == currentPanel) return;
 
-        currentPanel?.OnClose();
+        currentPanel?.Close();
 
         currentPanel = newPage;
-        currentPanel?.OnOpen();
+        currentPanel?.Open();
 
-        SetMainMenuVisible(false);
+        mainMenuPage.Close();
     }
 
     public void CloseCurrentPage()
     {
-        currentPanel?.OnClose();
+        currentPanel?.Close();
         currentPanel = null;
 
-        SetMainMenuVisible(true);
-    }
-
-    private void SetMainMenuVisible(bool visible)
-    {
-        mainMenuPanel.SetActive(visible);
+        mainMenuPage.Open();
     }
 }

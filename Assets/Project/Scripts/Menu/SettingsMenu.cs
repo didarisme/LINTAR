@@ -5,9 +5,6 @@ using TMPro;
 
 public class SettingsMenu : Pageable
 {
-    [Header("Panel")]
-    [SerializeField] private GameObject settingsPanel;
-
     [Header("Dropdowns")]
     [SerializeField] private TMP_Dropdown resolutionDropdown;
     [SerializeField] private TMP_Dropdown qualityDropdown;
@@ -20,8 +17,10 @@ public class SettingsMenu : Pageable
     private List<Resolution> _uniqueResolutions = new List<Resolution>();
     private readonly int[] _fpsOptions = { 30, 60, 120, 144, -1 };
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
+
         InitResolutions();
         InitQuality();
         InitVSync();
@@ -29,14 +28,14 @@ public class SettingsMenu : Pageable
         InitFPS();
     }
 
-    public override void OnOpen()
+    protected override void OnOpen()
     {
-        settingsPanel.SetActive(true);
+        // page open
     }
 
-    public override void OnClose()
+    protected override void OnClose()
     {
-        settingsPanel.SetActive(false);
+        // page close
     }
 
     private void InitResolutions()

@@ -1,102 +1,81 @@
-using System.Collections;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class InfoPanel : Pageable
 {
-    [SerializeField] private GameObject infoPanel;
-    [SerializeField] private GameObject[] pages;
-    [SerializeField] private InfoNavButton[] navButtons;
+    [SerializeField] private InfoPage[] infoPages;
 
-    [Header("Animation")]
-    [SerializeField] private float fadeDuration = 0.2f;
+    [Header("Colors")]
+    [SerializeField] private Color defaultColor = Color.gray;
+    [SerializeField] private Color selectedColor = Color.orange;
 
-    private int _activePage = 0;
-    private Coroutine _fadeCoroutine;
+    private int _currentIndex = -1;
 
-    private void Awake()
+    protected override void Awake()
     {
-        foreach (GameObject page in pages)
+        base.Awake();
+
+        ConfigureButtons();
+    }
+
+    protected override void OnOpen()
+    {
+        OpenPage(0);
+    }
+
+    protected override void OnClose()
+    {
+        if (_currentIndex != -1)
         {
-            page.SetActive(false);
-            GetCanvasGroup(page).alpha = 1f;
+            infoPages[_currentIndex].page.Close();
+        }
+
+        _currentIndex = -1;
+    }
+
+    private void ConfigureButtons()
+    {   
+        for (int i = 0; i < infoPages.Length; i++)
+        {
+            int index = i;
+
+            infoPages[i].pageButton.onClick.AddListener(() =>
+            {
+                OpenPage(index);
+            });
+
+            SetButtonColor(i, defaultColor);
         }
     }
 
-    public override void OnOpen()
+    private void OpenPage(int index)
     {
-        infoPanel.SetActive(true);
-        _activePage = -1;
-
-        OpenPageByIndex(0);
-    }
-
-    public override void OnClose()
-    {
-        if (_fadeCoroutine != null)
-        {
-            StopCoroutine(_fadeCoroutine);
-            _fadeCoroutine = null;
-        }
-
-        infoPanel.SetActive(false);
-    }
-
-    public void OpenPageByIndex(int pageIndex)
-    {
-        if (pages == null || pages.Length == 0) return;
-
-        for (int i = 0; i < navButtons.Length; i++)
-            navButtons[i].SetActiveColor(i == pageIndex);
-
-        if (_activePage == -1)
-        {
-            _activePage = pageIndex;
-            pages[pageIndex].SetActive(true);
+        if (index == _currentIndex)
             return;
-        }
 
-        if (pageIndex == _activePage && pages[_activePage].activeSelf) return;
-
-        if (_fadeCoroutine != null)
-            StopCoroutine(_fadeCoroutine);
-
-        _fadeCoroutine = StartCoroutine(FadePage(_activePage, pageIndex));
-    }
-
-    private IEnumerator FadePage(int fromIndex, int toIndex)
-    {
-        CanvasGroup from = GetCanvasGroup(pages[fromIndex]);
-        yield return StartCoroutine(Fade(from, 1f, 0f));
-        pages[fromIndex].SetActive(false);
-
-        _activePage = toIndex;
-        pages[toIndex].SetActive(true);
-
-        CanvasGroup to = GetCanvasGroup(pages[toIndex]);
-        to.alpha = 0f;
-        yield return StartCoroutine(Fade(to, 0f, 1f));
-    }
-
-    private IEnumerator Fade(CanvasGroup cg, float from, float to)
-    {
-        float elapsed = 0f;
-        cg.alpha = from;
-
-        while (elapsed < fadeDuration)
+        if (_currentIndex != -1)
         {
-            elapsed += Time.deltaTime;
-            cg.alpha = Mathf.Lerp(from, to, elapsed / fadeDuration);
-            yield return null;
+            infoPages[_currentIndex].page.Close();
+            SetButtonColor(_currentIndex, defaultColor);
         }
 
-        cg.alpha = to;
+        _currentIndex = index;
+        infoPages[index].page.Open();
+
+        SetButtonColor(index, selectedColor);
     }
 
-    private CanvasGroup GetCanvasGroup(GameObject go)
+    private void SetButtonColor(int index, Color color)
     {
-        CanvasGroup cg = go.GetComponent<CanvasGroup>();
-        if (cg == null)
-            cg = go.AddComponent<CanvasGroup>();
-        return cg;
+        infoPages[index].btnText.color = color;
+    }
+
+    [System.Serializable]
+    private struct InfoPage
+    {
+        public Pageable page;
+        public Button pageButton;
+        public TextMeshProUGUI btnText;
     }
 }

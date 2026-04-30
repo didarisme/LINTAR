@@ -1503,56 +1503,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 150777709}
   m_CullTransparentMesh: 1
---- !u!1 &156947447
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 156947448}
-  - component: {fileID: 156947449}
-  m_Layer: 0
-  m_Name: SettingsPanel
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &156947448
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 156947447}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2037359956}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &156947449
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 156947447}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 802f32954b6886e4d9c71dcb033ef5c0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SettingsMenu
-  settingsPanel: {fileID: 1607309771}
-  resolutionDropdown: {fileID: 382553717}
-  qualityDropdown: {fileID: 839645950}
-  fpsDropdown: {fileID: 1184982387}
-  vsyncToggle: {fileID: 1821059226}
-  fullscreenToggle: {fileID: 1844618473}
 --- !u!1 &159416908
 GameObject:
   m_ObjectHideFlags: 0
@@ -1713,7 +1663,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2037359957}
+      - m_Target: {fileID: 605225881}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: CloseCurrentPage
         m_Mode: 1
@@ -3309,63 +3259,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 366651273}
   m_CullTransparentMesh: 1
---- !u!1 &375293446
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 375293447}
-  - component: {fileID: 375293448}
-  m_Layer: 5
-  m_Name: SimulationManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &375293447
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 375293446}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 960, y: 540, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2037359956}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &375293448
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 375293446}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5d6ad8554fb9f194b97635e9bf853972, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  fireScenario: {fileID: 11400000, guid: d4bc02d44b21a6e4eb33febe426f7974, type: 2}
-  chooseSimPanel: {fileID: 926673854}
-  contentParent: {fileID: 660223291}
-  simButtonPrefab: {fileID: 5832082768681216906, guid: f4c761c3a7a81b443a1ec4b79c9ca8b8, type: 3}
-  continueButton: {fileID: 1008336958}
-  confirmationDialog: {fileID: 854764841}
-  scrollRect: {fileID: 105407641}
-  normalColor: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 1}
-  selectedColor: {r: 0.7607843, g: 0.3529412, b: 0.101960786, a: 1}
-  entryDuration: 0.35
-  entryStagger: 0.06
-  colorLerpSpeed: 8
-  exitDuration: 0.25
 --- !u!1 &382553715
 GameObject:
   m_ObjectHideFlags: 0
@@ -4587,7 +4480,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2037359957}
+      - m_Target: {fileID: 605225881}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: OpenChooseSim
         m_Mode: 1
@@ -5035,6 +4928,55 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 588076826}
   m_CullTransparentMesh: 1
+--- !u!1 &605225879
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 605225880}
+  - component: {fileID: 605225881}
+  m_Layer: 0
+  m_Name: MenuController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &605225880
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 605225879}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2037359956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &605225881
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 605225879}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56e8a7b901f03634399ef899f12acdd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MainMenuController
+  mainMenuPage: {fileID: 1093549599}
+  chooseSimPage: {fileID: 926673859}
+  uploadSimPage: {fileID: 990420107}
+  settingsPage: {fileID: 1607309776}
+  infoPage: {fileID: 770761785}
 --- !u!1 &660223290
 GameObject:
   m_ObjectHideFlags: 0
@@ -5874,6 +5816,8 @@ GameObject:
   m_Component:
   - component: {fileID: 770761781}
   - component: {fileID: 770761783}
+  - component: {fileID: 770761784}
+  - component: {fileID: 770761785}
   m_Layer: 5
   m_Name: InfoPanel
   m_TagString: Untagged
@@ -5913,6 +5857,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 770761780}
   m_CullTransparentMesh: 1
+--- !u!225 &770761784
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 770761780}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &770761785
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 770761780}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e2454ae4379ff1438ecf896ad057b8c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pageGroup: {fileID: 770761784}
+  transitionDuration: 1
+  animatePage: 1
+  infoPages: []
+  defaultColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  selectedColor: {r: 1, g: 0.6470588, b: 0, a: 1}
 --- !u!1 &773398421
 GameObject:
   m_ObjectHideFlags: 0
@@ -5996,7 +5970,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2037359957}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: OpenChooseSim
         m_Mode: 1
@@ -6147,12 +6121,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 803509050}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 976.761, y: 648.431, z: 1.9326172}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 2037359956}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &803509053
 MonoBehaviour:
@@ -7273,7 +7247,8 @@ GameObject:
   m_Component:
   - component: {fileID: 926673855}
   - component: {fileID: 926673857}
-  - component: {fileID: 926673856}
+  - component: {fileID: 926673858}
+  - component: {fileID: 926673859}
   m_Layer: 5
   m_Name: ChooseSimPanel
   m_TagString: Untagged
@@ -7307,36 +7282,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &926673856
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 926673854}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.09411765, g: 0.09411765, b: 0.09411765, a: 0.392}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &926673857
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7345,6 +7290,45 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 926673854}
   m_CullTransparentMesh: 1
+--- !u!225 &926673858
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 926673854}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &926673859
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 926673854}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d6ad8554fb9f194b97635e9bf853972, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pageGroup: {fileID: 926673858}
+  transitionDuration: 1
+  animatePage: 1
+  fireScenario: {fileID: 11400000, guid: d4bc02d44b21a6e4eb33febe426f7974, type: 2}
+  contentParent: {fileID: 660223291}
+  simButtonPrefab: {fileID: 5832082768681216906, guid: f4c761c3a7a81b443a1ec4b79c9ca8b8, type: 3}
+  continueButton: {fileID: 1008336958}
+  confirmationDialog: {fileID: 854764841}
+  scrollRect: {fileID: 105407641}
+  normalColor: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 1}
+  selectedColor: {r: 0.7607843, g: 0.3529412, b: 0.101960786, a: 1}
+  entryDuration: 0.35
+  entryStagger: 0.06
+  colorLerpSpeed: 8
+  exitDuration: 0.25
 --- !u!1 &985346579
 GameObject:
   m_ObjectHideFlags: 0
@@ -7476,7 +7460,8 @@ GameObject:
   m_Component:
   - component: {fileID: 990420103}
   - component: {fileID: 990420105}
-  - component: {fileID: 990420104}
+  - component: {fileID: 990420106}
+  - component: {fileID: 990420107}
   m_Layer: 5
   m_Name: UploadSimPanel
   m_TagString: Untagged
@@ -7510,36 +7495,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &990420104
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 990420102}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 0}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &990420105
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -7548,6 +7503,45 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 990420102}
   m_CullTransparentMesh: 1
+--- !u!225 &990420106
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 990420102}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &990420107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 990420102}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eedf1d08c5f61094a80a55a97ca0f7bc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pageGroup: {fileID: 990420106}
+  transitionDuration: 1
+  animatePage: 1
+  uploadPanelBtn: {fileID: 292401740}
+  uploadAnotherBtn: {fileID: 206426886}
+  continueButton: {fileID: 1464564318}
+  btnGoToSims: {fileID: 2077098133}
+  uploadPanel: {fileID: 990420102}
+  postUploadButtons: {fileID: 2110319508}
+  labelText: {fileID: 476898527}
+  fileNameText: {fileID: 1429340349}
+  defaultColor: {r: 0.4566037, g: 0.4400708, b: 0.4298967, a: 1}
+  selectedColor: {r: 0.45490196, g: 0.4392157, b: 0.43137255, a: 1}
+  successColor: {r: 0.3, g: 0.8, b: 0.4, a: 1}
+  warningColor: {r: 0.9, g: 0.7, b: 0.2, a: 1}
 --- !u!1 &1008336956
 GameObject:
   m_ObjectHideFlags: 0
@@ -7799,7 +7793,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2037359957}
+      - m_Target: {fileID: 605225881}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: OpenInfo
         m_Mode: 1
@@ -8022,62 +8016,6 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
---- !u!1 &1048448145
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1048448146}
-  - component: {fileID: 1048448147}
-  m_Layer: 5
-  m_Name: InfoManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1048448146
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1048448145}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 960, y: 540, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2037359956}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1048448147
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1048448145}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e2454ae4379ff1438ecf896ad057b8c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  infoPanel: {fileID: 770761780}
-  pages:
-  - {fileID: 1014812865}
-  - {fileID: 1112306760}
-  - {fileID: 90137138}
-  - {fileID: 2021433025}
-  navButtons:
-  - {fileID: 1925724147}
-  - {fileID: 1424495930}
-  - {fileID: 2044686519}
-  - {fileID: 2084608662}
-  fadeDuration: 0.2
 --- !u!1 &1071884567
 GameObject:
   m_ObjectHideFlags: 0
@@ -8472,6 +8410,8 @@ GameObject:
   - component: {fileID: 1093549595}
   - component: {fileID: 1093549596}
   - component: {fileID: 1093549597}
+  - component: {fileID: 1093549598}
+  - component: {fileID: 1093549599}
   m_Layer: 5
   m_Name: MainMenu
   m_TagString: Untagged
@@ -8538,6 +8478,33 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!225 &1093549598
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093549594}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &1093549599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1093549594}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
+  pageGroup: {fileID: 1093549598}
+  transitionDuration: 1
+  animatePage: 1
 --- !u!1 &1108168495
 GameObject:
   m_ObjectHideFlags: 0
@@ -9012,7 +8979,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2037359957}
+      - m_Target: {fileID: 605225881}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: CloseCurrentPage
         m_Mode: 1
@@ -10560,7 +10527,7 @@ GameObject:
   - component: {fileID: 1389467070}
   - component: {fileID: 1389467069}
   m_Layer: 5
-  m_Name: SettBtn
+  m_Name: SettingsBtn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10630,7 +10597,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2037359957}
+      - m_Target: {fileID: 605225881}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: OpenSettings
         m_Mode: 1
@@ -10827,6 +10794,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1424495925}
   - component: {fileID: 1424495928}
+  - component: {fileID: 1424495931}
   - component: {fileID: 1424495929}
   - component: {fileID: 1424495930}
   m_Layer: 5
@@ -10907,19 +10875,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1048448147}
-        m_TargetAssemblyTypeName: InfoPanel, Assembly-CSharp
-        m_MethodName: OpenPageByIndex
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 1
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1424495930
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10929,10 +10885,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1424495924}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00ebedf7d8e851642bb0a5859c6dc4f0, type: 3}
+  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InfoNavButton
-  label: {fileID: 738496064}
+  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
+  pageGroup: {fileID: 1424495931}
+  transitionDuration: 1
+  animatePage: 1
+--- !u!225 &1424495931
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1424495924}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1429340347
 GameObject:
   m_ObjectHideFlags: 0
@@ -11151,7 +11121,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2037359957}
+      - m_Target: {fileID: 605225881}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: CloseCurrentPage
         m_Mode: 1
@@ -11383,7 +11353,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2037359957}
+      - m_Target: {fileID: 605225881}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: OpenUploadSim
         m_Mode: 1
@@ -12574,62 +12544,6 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_IsOn: 1
---- !u!1 &1562964504
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1562964505}
-  - component: {fileID: 1562964506}
-  m_Layer: 5
-  m_Name: UploadManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1562964505
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1562964504}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2037359956}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1562964506
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1562964504}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: eedf1d08c5f61094a80a55a97ca0f7bc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  uploadPanelBtn: {fileID: 292401740}
-  uploadAnotherBtn: {fileID: 206426886}
-  continueButton: {fileID: 1464564318}
-  btnGoToSims: {fileID: 2077098133}
-  uploadPanel: {fileID: 990420102}
-  postUploadButtons: {fileID: 2110319508}
-  labelText: {fileID: 476898527}
-  fileNameText: {fileID: 1429340349}
-  defaultColor: {r: 0.4566037, g: 0.4400708, b: 0.4298967, a: 1}
-  selectedColor: {r: 0.45490196, g: 0.4392157, b: 0.43137255, a: 1}
-  successColor: {r: 0.3, g: 0.8, b: 0.4, a: 1}
-  warningColor: {r: 0.9, g: 0.7, b: 0.2, a: 1}
 --- !u!1 &1604427438
 GameObject:
   m_ObjectHideFlags: 0
@@ -12777,7 +12691,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1607309772}
   - component: {fileID: 1607309774}
-  - component: {fileID: 1607309773}
+  - component: {fileID: 1607309775}
+  - component: {fileID: 1607309776}
   m_Layer: 5
   m_Name: SettingPanel
   m_TagString: Untagged
@@ -12809,36 +12724,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &1607309773
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1607309771}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_Material: {fileID: 0}
-  m_Color: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 0}
-  m_RaycastTarget: 1
-  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
-  m_Maskable: 1
-  m_OnCullStateChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  m_Sprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
-  m_Type: 1
-  m_PreserveAspect: 0
-  m_FillCenter: 1
-  m_FillMethod: 4
-  m_FillAmount: 1
-  m_FillClockwise: 1
-  m_FillOrigin: 0
-  m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
 --- !u!222 &1607309774
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -12847,6 +12732,38 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1607309771}
   m_CullTransparentMesh: 1
+--- !u!225 &1607309775
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1607309771}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &1607309776
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1607309771}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 802f32954b6886e4d9c71dcb033ef5c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SettingsMenu
+  pageGroup: {fileID: 1607309775}
+  transitionDuration: 1
+  animatePage: 1
+  resolutionDropdown: {fileID: 382553717}
+  qualityDropdown: {fileID: 839645950}
+  fpsDropdown: {fileID: 1184982387}
+  vsyncToggle: {fileID: 1821059226}
+  fullscreenToggle: {fileID: 1844618473}
 --- !u!1 &1607699084
 GameObject:
   m_ObjectHideFlags: 0
@@ -14962,6 +14879,50 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1882498891}
   m_CullTransparentMesh: 1
+--- !u!1 &1885026830
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1885026831}
+  - component: {fileID: 1885026832}
+  m_Layer: 0
+  m_Name: PageTransitioner
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1885026831
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885026830}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2037359956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1885026832
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885026830}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 134f855f716938c40a1b6a631611a695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PageTransitioner
 --- !u!1 &1901785358
 GameObject:
   m_ObjectHideFlags: 0
@@ -15109,6 +15070,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1925724142}
   - component: {fileID: 1925724145}
+  - component: {fileID: 1925724148}
   - component: {fileID: 1925724146}
   - component: {fileID: 1925724147}
   m_Layer: 5
@@ -15189,19 +15151,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1048448147}
-        m_TargetAssemblyTypeName: InfoPanel, Assembly-CSharp
-        m_MethodName: OpenPageByIndex
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &1925724147
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15211,10 +15161,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 1925724141}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00ebedf7d8e851642bb0a5859c6dc4f0, type: 3}
+  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InfoNavButton
-  label: {fileID: 1880136616}
+  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
+  pageGroup: {fileID: 1925724148}
+  transitionDuration: 1
+  animatePage: 1
+--- !u!225 &1925724148
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925724141}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1939908723
 GameObject:
   m_ObjectHideFlags: 0
@@ -16361,7 +16325,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2037359956}
-  - component: {fileID: 2037359957}
   m_Layer: 0
   m_Name: MenuLogics
   m_TagString: Untagged
@@ -16382,29 +16345,11 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 375293447}
-  - {fileID: 1562964505}
-  - {fileID: 1048448146}
-  - {fileID: 156947448}
+  - {fileID: 605225880}
+  - {fileID: 803509052}
+  - {fileID: 1885026831}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2037359957
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2037359955}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 56e8a7b901f03634399ef899f12acdd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::MainMenuController
-  mainMenuPanel: {fileID: 1093549594}
-  chooseSimPage: {fileID: 375293448}
-  uploadSimPage: {fileID: 1562964506}
-  settingsPage: {fileID: 156947449}
-  infoPage: {fileID: 1048448147}
 --- !u!1 &2040888821
 GameObject:
   m_ObjectHideFlags: 0
@@ -16552,6 +16497,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2044686514}
   - component: {fileID: 2044686517}
+  - component: {fileID: 2044686520}
   - component: {fileID: 2044686518}
   - component: {fileID: 2044686519}
   m_Layer: 5
@@ -16632,19 +16578,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1048448147}
-        m_TargetAssemblyTypeName: InfoPanel, Assembly-CSharp
-        m_MethodName: OpenPageByIndex
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 2
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &2044686519
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16654,10 +16588,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 2044686513}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00ebedf7d8e851642bb0a5859c6dc4f0, type: 3}
+  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InfoNavButton
-  label: {fileID: 1943728329}
+  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
+  pageGroup: {fileID: 2044686520}
+  transitionDuration: 1
+  animatePage: 1
+--- !u!225 &2044686520
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2044686513}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2050302708
 GameObject:
   m_ObjectHideFlags: 0
@@ -16818,7 +16766,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2037359957}
+      - m_Target: {fileID: 605225881}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: CloseCurrentPage
         m_Mode: 1
@@ -16989,7 +16937,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2037359957}
+      - m_Target: {fileID: 605225881}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: OnExitBtn
         m_Mode: 1
@@ -17259,7 +17207,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2037359957}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: OpenChooseSim
         m_Mode: 1
@@ -17320,6 +17268,7 @@ GameObject:
   - component: {fileID: 2084608657}
   - component: {fileID: 2084608660}
   - component: {fileID: 2084608661}
+  - component: {fileID: 2084608663}
   - component: {fileID: 2084608662}
   m_Layer: 5
   m_Name: NavButton_Examples
@@ -17399,19 +17348,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 0}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1048448147}
-        m_TargetAssemblyTypeName: InfoPanel, Assembly-CSharp
-        m_MethodName: OpenPageByIndex
-        m_Mode: 3
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 3
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
 --- !u!114 &2084608662
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17421,10 +17358,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 2084608656}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00ebedf7d8e851642bb0a5859c6dc4f0, type: 3}
+  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::InfoNavButton
-  label: {fileID: 1882498893}
+  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
+  pageGroup: {fileID: 2084608663}
+  transitionDuration: 1
+  animatePage: 1
+--- !u!225 &2084608663
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2084608656}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2110319508
 GameObject:
   m_ObjectHideFlags: 0
@@ -17713,5 +17664,4 @@ SceneRoots:
   - {fileID: 1046063510}
   - {fileID: 559568227}
   - {fileID: 2117857381}
-  - {fileID: 803509052}
   - {fileID: 2037359956}

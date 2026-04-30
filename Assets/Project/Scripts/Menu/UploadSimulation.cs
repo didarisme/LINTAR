@@ -34,13 +34,13 @@ public class UploadSimulation : Pageable
         Initialize();
     }
 
-    public override void OnOpen()
+    protected override void OnOpen()
     {
         uploadPanel.SetActive(true);
         ResetUI();
     }
 
-    public override void OnClose()
+    protected override void OnClose()
     {
         _pendingFilePaths = null;
         uploadPanel.SetActive(false);

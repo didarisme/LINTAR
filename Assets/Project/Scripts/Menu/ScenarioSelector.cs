@@ -11,7 +11,6 @@ public class ScenarioSelector : Pageable
     [SerializeField] private FireScenarioSelectorSO fireScenario;
 
     [Header("References")]
-    [SerializeField] private GameObject chooseSimPanel;
     [SerializeField] private Transform contentParent;
     [SerializeField] private GameObject simButtonPrefab;
     [SerializeField] private Button continueButton;
@@ -34,25 +33,24 @@ public class ScenarioSelector : Pageable
 
     private readonly Dictionary<string, GameObject> _buttons = new();
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
+
         _folderPath = Path.Combine(Application.streamingAssetsPath, "FireScenarios");
 
         continueButton.interactable = false;
         continueButton.onClick.AddListener(OnContinuePressed);
     }
 
-    public override void OnOpen()
+    protected override void OnOpen()
     {
-        chooseSimPanel.SetActive(true);
-
         LoadSimulations();
         AnimateAllButtons();
     }
 
-    public override void OnClose()
+    protected override void OnClose()
     {
-        chooseSimPanel.SetActive(false);
         ResetSelection();
         ResetScrollPosition();
 
