@@ -29,6 +29,7 @@ public class InfoPanel : Pageable
         if (_currentIndex != -1)
         {
             infoPages[_currentIndex].page.Close();
+            SetButtonColor(_currentIndex, defaultColor);
         }
 
         _currentIndex = -1;

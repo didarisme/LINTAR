@@ -909,6 +909,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 90137139}
+  - component: {fileID: 90137140}
+  - component: {fileID: 90137141}
   m_Layer: 5
   m_Name: Section_Parameters
   m_TagString: Untagged
@@ -938,6 +940,33 @@ RectTransform:
   m_AnchoredPosition: {x: 100, y: 100}
   m_SizeDelta: {x: 1300, y: 95.5}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!225 &90137140
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 90137138}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
+--- !u!114 &90137141
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 90137138}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
+  pageGroup: {fileID: 90137140}
+  transitionDuration: 1
+  animatePage: 1
 --- !u!1 &102690132
 GameObject:
   m_ObjectHideFlags: 0
@@ -5884,7 +5913,19 @@ MonoBehaviour:
   pageGroup: {fileID: 770761784}
   transitionDuration: 1
   animatePage: 1
-  infoPages: []
+  infoPages:
+  - page: {fileID: 1014812867}
+    pageButton: {fileID: 1925724146}
+    btnText: {fileID: 1880136616}
+  - page: {fileID: 1112306762}
+    pageButton: {fileID: 1424495929}
+    btnText: {fileID: 738496064}
+  - page: {fileID: 90137141}
+    pageButton: {fileID: 2044686518}
+    btnText: {fileID: 1943728329}
+  - page: {fileID: 2021433027}
+    pageButton: {fileID: 2084608661}
+    btnText: {fileID: 1882498893}
   defaultColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   selectedColor: {r: 1, g: 0.6470588, b: 0, a: 1}
 --- !u!1 &773398421
@@ -7673,6 +7714,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1014812866}
   - component: {fileID: 1014812868}
+  - component: {fileID: 1014812867}
   m_Layer: 5
   m_Name: Section_Overview
   m_TagString: Untagged
@@ -7702,14 +7744,33 @@ RectTransform:
   m_AnchoredPosition: {x: 100, y: 100}
   m_SizeDelta: {x: 1300, y: 95.5}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!222 &1014812868
-CanvasRenderer:
+--- !u!114 &1014812867
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1014812865}
-  m_CullTransparentMesh: 1
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
+  pageGroup: {fileID: 1014812868}
+  transitionDuration: 1
+  animatePage: 1
+--- !u!225 &1014812868
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1014812865}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1019227170
 GameObject:
   m_ObjectHideFlags: 0
@@ -8689,6 +8750,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1112306761}
+  - component: {fileID: 1112306763}
+  - component: {fileID: 1112306762}
   m_Layer: 5
   m_Name: Section_JSON
   m_TagString: Untagged
@@ -8718,6 +8781,33 @@ RectTransform:
   m_AnchoredPosition: {x: 100, y: 100}
   m_SizeDelta: {x: 1300, y: 95.5}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &1112306762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1112306760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
+  pageGroup: {fileID: 1112306763}
+  transitionDuration: 1
+  animatePage: 1
+--- !u!225 &1112306763
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1112306760}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &1112901391
 GameObject:
   m_ObjectHideFlags: 0
@@ -10794,9 +10884,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1424495925}
   - component: {fileID: 1424495928}
-  - component: {fileID: 1424495931}
   - component: {fileID: 1424495929}
-  - component: {fileID: 1424495930}
   m_Layer: 5
   m_Name: NavButton_JSON
   m_TagString: Untagged
@@ -10876,33 +10964,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1424495930
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1424495924}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
-  pageGroup: {fileID: 1424495931}
-  transitionDuration: 1
-  animatePage: 1
---- !u!225 &1424495931
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1424495924}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &1429340347
 GameObject:
   m_ObjectHideFlags: 0
@@ -15070,9 +15131,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1925724142}
   - component: {fileID: 1925724145}
-  - component: {fileID: 1925724148}
   - component: {fileID: 1925724146}
-  - component: {fileID: 1925724147}
   m_Layer: 5
   m_Name: 'NavButton_Overview '
   m_TagString: Untagged
@@ -15152,33 +15211,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &1925724147
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925724141}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
-  pageGroup: {fileID: 1925724148}
-  transitionDuration: 1
-  animatePage: 1
---- !u!225 &1925724148
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1925724141}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &1939908723
 GameObject:
   m_ObjectHideFlags: 0
@@ -16060,8 +16092,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2021433026}
+  - component: {fileID: 2021433028}
+  - component: {fileID: 2021433027}
   m_Layer: 5
-  m_Name: Examples
+  m_Name: Section_Examples
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -16089,6 +16123,33 @@ RectTransform:
   m_AnchoredPosition: {x: 100, y: 100}
   m_SizeDelta: {x: 1300, y: 95.5}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2021433027
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2021433025}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
+  pageGroup: {fileID: 2021433028}
+  transitionDuration: 1
+  animatePage: 1
+--- !u!225 &2021433028
+CanvasGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2021433025}
+  m_Enabled: 1
+  m_Alpha: 1
+  m_Interactable: 1
+  m_BlocksRaycasts: 1
+  m_IgnoreParentGroups: 0
 --- !u!1 &2028865845
 GameObject:
   m_ObjectHideFlags: 0
@@ -16497,9 +16558,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2044686514}
   - component: {fileID: 2044686517}
-  - component: {fileID: 2044686520}
   - component: {fileID: 2044686518}
-  - component: {fileID: 2044686519}
   m_Layer: 5
   m_Name: NavButton_Parameters
   m_TagString: Untagged
@@ -16579,33 +16638,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &2044686519
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2044686513}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
-  pageGroup: {fileID: 2044686520}
-  transitionDuration: 1
-  animatePage: 1
---- !u!225 &2044686520
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2044686513}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &2050302708
 GameObject:
   m_ObjectHideFlags: 0
@@ -17268,8 +17300,6 @@ GameObject:
   - component: {fileID: 2084608657}
   - component: {fileID: 2084608660}
   - component: {fileID: 2084608661}
-  - component: {fileID: 2084608663}
-  - component: {fileID: 2084608662}
   m_Layer: 5
   m_Name: NavButton_Examples
   m_TagString: Untagged
@@ -17349,33 +17379,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &2084608662
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2084608656}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ddb2315d62959b54da8ad18edcb435e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlainPage
-  pageGroup: {fileID: 2084608663}
-  transitionDuration: 1
-  animatePage: 1
---- !u!225 &2084608663
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2084608656}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &2110319508
 GameObject:
   m_ObjectHideFlags: 0
