@@ -7575,7 +7575,6 @@ MonoBehaviour:
   uploadAnotherBtn: {fileID: 206426886}
   continueButton: {fileID: 1464564318}
   btnGoToSims: {fileID: 2077098133}
-  uploadPanel: {fileID: 990420102}
   postUploadButtons: {fileID: 2110319508}
   labelText: {fileID: 476898527}
   fileNameText: {fileID: 1429340349}

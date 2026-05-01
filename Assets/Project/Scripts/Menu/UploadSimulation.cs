@@ -13,7 +13,6 @@ public class UploadSimulation : Pageable
     [SerializeField] private Button btnGoToSims;
 
     [Space]
-    [SerializeField] private GameObject uploadPanel;
     [SerializeField] private GameObject postUploadButtons;
     [SerializeField] private TextMeshProUGUI labelText;
     [SerializeField] private TextMeshProUGUI fileNameText;
@@ -29,21 +28,23 @@ public class UploadSimulation : Pageable
 
     private bool _initialized = false;
 
-    private void Start()
+    protected override void Awake()
     {
+        base.Awake();
+        
         Initialize();
+        ResetUI();
     }
 
     protected override void OnOpen()
     {
-        uploadPanel.SetActive(true);
-        ResetUI();
+        // page open
     }
 
     protected override void OnClose()
     {
         _pendingFilePaths = null;
-        uploadPanel.SetActive(false);
+        ResetUI();
     }
 
     private void Initialize()

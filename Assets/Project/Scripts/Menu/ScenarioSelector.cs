@@ -33,6 +33,9 @@ public class ScenarioSelector : Pageable
 
     private readonly Dictionary<string, GameObject> _buttons = new();
 
+    private readonly List<Coroutine> _activeAnimations = new();
+    private bool animateEntry = true;
+
     protected override void Awake()
     {
         base.Awake();
@@ -54,11 +57,121 @@ public class ScenarioSelector : Pageable
         ResetSelection();
         ResetScrollPosition();
 
-        StopAllCoroutines();
+        StopAllAnimations();
+        SetAllButtonsAlpha(0f);
     }
 
     // =========================
-    // LOAD (объединённый метод)
+    // ANIMATION CONTROL
+    // =========================
+    private void RunAnimation(IEnumerator routine)
+    {
+        Coroutine c = StartCoroutine(routine);
+        _activeAnimations.Add(c);
+    }
+
+    private void StopAllAnimations()
+    {
+        foreach (var c in _activeAnimations)
+        {
+            if (c != null)
+                StopCoroutine(c);
+        }
+
+        _activeAnimations.Clear();
+    }
+
+    // =========================
+    // UNIVERSAL ANIMATION CORE
+    // =========================
+    private IEnumerator AnimateFloat(System.Action<float> setter, float from, float to, float duration)
+    {
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / duration);
+            setter(Mathf.Lerp(from, to, t));
+            yield return null;
+        }
+
+        setter(to);
+    }
+
+    private IEnumerator AnimateAlpha(CanvasGroup cg, float from, float to, float duration)
+    {
+        yield return AnimateFloat(v => cg.alpha = v, from, to, duration);
+    }
+
+    private IEnumerator AnimateScale(Transform target, Vector3 from, Vector3 to, float duration)
+    {
+        yield return AnimateFloat(
+            t => target.localScale = Vector3.Lerp(from, to, t),
+            0f,
+            1f,
+            duration
+        );
+    }
+
+    private IEnumerator AnimateColor(Image img, Color target)
+    {
+        Color start = img.color;
+
+        yield return AnimateFloat(t =>
+        {
+            img.color = Color.Lerp(start, target, t);
+        }, 0f, 1f, 1f / colorLerpSpeed);
+    }
+
+    // =========================
+    // UI HELPERS
+    // =========================
+    private void SetAllButtonsAlpha(float alpha)
+    {
+        foreach (Transform child in contentParent)
+        {
+            if (!child.TryGetComponent(out CanvasGroup cg))
+                cg = child.gameObject.AddComponent<CanvasGroup>();
+
+            cg.alpha = alpha;
+        }
+
+        animateEntry = true;
+    }
+
+    private void ResetSelection()
+    {
+        if (_selectedButton != null)
+            _selectedButton.GetComponent<Image>().color = normalColor;
+
+        _selectedScenarioPath = null;
+        _selectedButton = null;
+        continueButton.interactable = false;
+    }
+
+    private void ResetScrollPosition()
+    {
+        scrollRect.verticalNormalizedPosition = 1f;
+        scrollRect.velocity = Vector2.zero;
+    }
+
+    private void AnimateAllButtons()
+    {
+        if (!animateEntry) return;
+
+        int index = 0;
+
+        foreach (Transform child in contentParent)
+        {
+            RunAnimation(AnimateEntry(child.gameObject, index++));
+        }
+
+        animateEntry = false;
+    }
+
+    // =========================
+    // LOAD
     // =========================
     private void LoadSimulations()
     {
@@ -71,16 +184,12 @@ public class ScenarioSelector : Pageable
         string[] files = Directory.GetFiles(_folderPath, "*.txt");
         HashSet<string> currentFiles = new(files);
 
-        // Добавляем новые
         foreach (var file in files)
         {
             if (!_buttons.ContainsKey(file))
-            {
                 CreateButton(file);
-            }
         }
 
-        // Удаляем отсутствующие
         var toRemove = new List<string>();
 
         foreach (var kvp in _buttons)
@@ -93,9 +202,7 @@ public class ScenarioSelector : Pageable
         }
 
         foreach (var key in toRemove)
-        {
             _buttons.Remove(key);
-        }
     }
 
     private void CreateButton(string filePath)
@@ -134,7 +241,7 @@ public class ScenarioSelector : Pageable
     {
         if (_selectedButton != null)
         {
-            StartCoroutine(AnimateColor(
+            RunAnimation(AnimateColor(
                 _selectedButton.GetComponent<Image>(),
                 normalColor));
         }
@@ -142,7 +249,7 @@ public class ScenarioSelector : Pageable
         _selectedScenarioPath = path;
         _selectedButton = btn;
 
-        StartCoroutine(AnimateColor(
+        RunAnimation(AnimateColor(
             btn.GetComponent<Image>(),
             selectedColor));
 
@@ -162,57 +269,12 @@ public class ScenarioSelector : Pageable
 
         _buttons.Remove(filePath);
 
-        StartCoroutine(AnimateExit(btn));
-    }
-
-    // =========================
-    // UI HELPERS
-    // =========================
-    private void ResetSelection()
-    {
-        if (_selectedButton != null)
-        {
-            _selectedButton.GetComponent<Image>().color = normalColor;
-        }
-
-        _selectedScenarioPath = null;
-        _selectedButton = null;
-        continueButton.interactable = false;
-    }
-
-    private void ResetScrollPosition()
-    {
-        scrollRect.verticalNormalizedPosition = 1f;
-        scrollRect.velocity = Vector2.zero;
-    }
-
-    private void AnimateAllButtons()
-    {
-        int index = 0;
-        foreach (Transform child in contentParent)
-        {
-            StartCoroutine(AnimateEntry(child.gameObject, index++));
-        }
+        RunAnimation(AnimateExit(btn));
     }
 
     // =========================
     // ANIMATIONS
     // =========================
-    private IEnumerator AnimateColor(Image img, Color target)
-    {
-        Color start = img.color;
-        float t = 0f;
-
-        while (t < 1f)
-        {
-            t += Time.deltaTime * colorLerpSpeed;
-            img.color = Color.Lerp(start, target, t);
-            yield return null;
-        }
-
-        img.color = target;
-    }
-
     private IEnumerator AnimateEntry(GameObject btn, int index)
     {
         if (!btn.TryGetComponent(out CanvasGroup cg))
@@ -225,21 +287,8 @@ public class ScenarioSelector : Pageable
 
         yield return new WaitForSeconds(index * entryStagger);
 
-        float elapsed = 0f;
-
-        while (elapsed < entryDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = Mathf.SmoothStep(0f, 1f, elapsed / entryDuration);
-
-            cg.alpha = t;
-            rect.localScale = Vector3.Lerp(Vector3.one * 0.85f, Vector3.one, t);
-
-            yield return null;
-        }
-
-        cg.alpha = 1f;
-        rect.localScale = Vector3.one;
+        RunAnimation(AnimateAlpha(cg, 0f, 1f, entryDuration));
+        yield return AnimateScale(rect, Vector3.one * 0.85f, Vector3.one, entryDuration);
     }
 
     private IEnumerator AnimateExit(GameObject btn)
@@ -249,18 +298,8 @@ public class ScenarioSelector : Pageable
 
         btn.GetComponent<Button>().interactable = false;
 
-        float elapsed = 0f;
-
-        while (elapsed < exitDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = elapsed / exitDuration;
-
-            cg.alpha = 1f - t;
-            btn.transform.localScale = Vector3.Lerp(Vector3.one, Vector3.one * 0.85f, t);
-
-            yield return null;
-        }
+        RunAnimation(AnimateAlpha(cg, 1f, 0f, exitDuration));
+        yield return AnimateScale(btn.transform, Vector3.one, Vector3.one * 0.85f, exitDuration);
 
         Destroy(btn);
     }
