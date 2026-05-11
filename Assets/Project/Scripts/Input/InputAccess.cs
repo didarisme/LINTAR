@@ -15,6 +15,7 @@ public class InputAccess : MonoBehaviour
         }
 
         Instance = this;
+        transform.SetParent(null);
         DontDestroyOnLoad(gameObject);
 
         Input = new PlayerInputActions();

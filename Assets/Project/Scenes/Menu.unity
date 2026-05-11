@@ -7364,12 +7364,10 @@ MonoBehaviour:
   continueButton: {fileID: 1008336958}
   confirmationDialog: {fileID: 854764841}
   scrollRect: {fileID: 105407641}
-  normalColor: {r: 0.09433961, g: 0.09433961, b: 0.09433961, a: 1}
-  selectedColor: {r: 0.7607843, g: 0.3529412, b: 0.101960786, a: 1}
-  entryDuration: 0.35
-  entryStagger: 0.06
+  entryDuration: 0.3
+  entryStagger: 0.04
   colorLerpSpeed: 8
-  exitDuration: 0.25
+  exitDuration: 0.2
 --- !u!1 &985346579
 GameObject:
   m_ObjectHideFlags: 0
@@ -7574,14 +7572,9 @@ MonoBehaviour:
   uploadPanelBtn: {fileID: 292401740}
   uploadAnotherBtn: {fileID: 206426886}
   continueButton: {fileID: 1464564318}
-  btnGoToSims: {fileID: 2077098133}
   postUploadButtons: {fileID: 2110319508}
   labelText: {fileID: 476898527}
   fileNameText: {fileID: 1429340349}
-  defaultColor: {r: 0.4566037, g: 0.4400708, b: 0.4298967, a: 1}
-  selectedColor: {r: 0.45490196, g: 0.4392157, b: 0.43137255, a: 1}
-  successColor: {r: 0.3, g: 0.8, b: 0.4, a: 1}
-  warningColor: {r: 0.9, g: 0.7, b: 0.2, a: 1}
 --- !u!1 &1008336956
 GameObject:
   m_ObjectHideFlags: 0
@@ -16408,6 +16401,7 @@ Transform:
   - {fileID: 605225880}
   - {fileID: 803509052}
   - {fileID: 1885026831}
+  - {fileID: 2068943908}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2040888821
@@ -16809,6 +16803,50 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!1 &2068943907
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2068943908}
+  - component: {fileID: 2068943909}
+  m_Layer: 0
+  m_Name: SimulationMemoryController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2068943908
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2068943907}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2037359956}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2068943909
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2068943907}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 50ef108910526024fae3819671dafca3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SimulationMemoryManager
 --- !u!1 &2072546369
 GameObject:
   m_ObjectHideFlags: 0
@@ -17238,7 +17276,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 605225881}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
         m_MethodName: OpenChooseSim
         m_Mode: 1

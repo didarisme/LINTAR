@@ -13,9 +13,9 @@ public class FireSimLoader : MonoBehaviour
 
     private void Start()
     {
-        if (fireScenario == null || fireScenario.SelectedScenarioPath == null)
+        if (fireScenario == null || string.IsNullOrEmpty(fireScenario.SelectedScenarioPath))
         {
-            Debug.LogError("Fire scenario not selected!");
+            Debug.LogError("[FireSimLoader] Fire scenario not selected!");
             return;
         }
 
@@ -24,14 +24,62 @@ public class FireSimLoader : MonoBehaviour
 
     private void LoadFile()
     {
-        string path = fireScenario.SelectedScenarioPath;
+        string fileName = fireScenario.SelectedScenarioPath;
+        string content = SimulationMemoryManager.Instance.GetSimulationContent(fileName);
 
-        if (!System.IO.File.Exists(path))
+#if !UNITY_WEBGL || UNITY_EDITOR
+        if (content == null)
+            content = TryLoadFromDisk(fileName);
+#endif
+
+        if (content == null)
         {
-            Debug.LogError("File not found: " + path);
+            Debug.LogError($"[FireSimLoader] Simulation '{fileName}' not found in memory or on disk.");
             return;
         }
 
+        ParseContent(content);
+    }
+
+#if !UNITY_WEBGL || UNITY_EDITOR
+    private string TryLoadFromDisk(string fileName)
+    {
+        string[] candidates =
+        {
+            // Persistent data)
+            System.IO.Path.Combine(Application.persistentDataPath, fileName),
+
+            // StreamingAssets
+            System.IO.Path.Combine(Application.streamingAssetsPath, "FireScenarios", fileName),
+
+            // На случай, если в SO вдруг записан полный абсолютный путь
+            fileName
+        };
+
+        foreach (string path in candidates)
+        {
+            if (!System.IO.File.Exists(path))
+                continue;
+
+            try
+            {
+                string content = System.IO.File.ReadAllText(path);
+                SimulationMemoryManager.Instance.StoreSimulation(fileName, content);
+                Debug.Log($"[FireSimLoader] Loaded '{fileName}' from disk: {path}");
+                return content;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"[FireSimLoader] Failed to read '{path}': {ex.Message}");
+            }
+        }
+
+        return null;
+    }
+#endif
+
+    private void ParseContent(string content)
+    {
         var fireData = new Dictionary<int, List<Vector2Int>>();
 
         int minPx = 0, maxPx = 0, minPy = 0, maxPy = 0;
@@ -40,13 +88,22 @@ public class FireSimLoader : MonoBehaviour
         float centerPx = 0f, centerPy = 0f;
         int maxTick = 0;
 
-        string[] lines = System.IO.File.ReadAllLines(path);
+        string[] lines = content.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
         foreach (string line in lines)
         {
+            if (string.IsNullOrWhiteSpace(line))
+                continue;
+
             if (line.StartsWith("WORLD"))
             {
                 string[] p = line.Split(' ');
+
+                if (p.Length < 9)
+                {
+                    Debug.LogWarning($"[FireSimLoader] Malformed WORLD line: {line}");
+                    continue;
+                }
 
                 minPx = int.Parse(p[1]);
                 maxPx = int.Parse(p[2]);
@@ -56,7 +113,7 @@ public class FireSimLoader : MonoBehaviour
                 centerLon = double.Parse(p[5], CultureInfo.InvariantCulture);
                 centerLat = double.Parse(p[6], CultureInfo.InvariantCulture);
 
-                patchWidthMeters = float.Parse(p[7], CultureInfo.InvariantCulture);
+                patchWidthMeters  = float.Parse(p[7], CultureInfo.InvariantCulture);
                 patchHeightMeters = float.Parse(p[8], CultureInfo.InvariantCulture);
 
                 centerPx = (minPx + maxPx) / 2f;
@@ -66,14 +123,18 @@ public class FireSimLoader : MonoBehaviour
             }
 
             string clean = line.Replace("[", "").Replace("]", "");
-            string[] parts = clean.Split(' ');
+            string[] parts = clean.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
 
             if (parts.Length != 3)
                 continue;
 
-            int tick = int.Parse(parts[0]);
-            int x = int.Parse(parts[1]);
-            int y = int.Parse(parts[2]);
+            if (!int.TryParse(parts[0], out int tick)  ||
+                !int.TryParse(parts[1], out int x)     ||
+                !int.TryParse(parts[2], out int y))
+            {
+                Debug.LogWarning($"[FireSimLoader] Skipping unparseable line: {line}");
+                continue;
+            }
 
             if (tick > maxTick)
                 maxTick = tick;
@@ -86,15 +147,16 @@ public class FireSimLoader : MonoBehaviour
 
         var config = new FireSimConfig
         {
-            PatchWidthMeters = patchWidthMeters,
+            PatchWidthMeters  = patchWidthMeters,
             PatchHeightMeters = patchHeightMeters,
-            CenterPx = centerPx,
-            CenterPy = centerPy,
-            MapCenter = new double3(centerLon, centerLat, 600f),
-            FireData = fireData,
-            MaxTick = maxTick
+            CenterPx          = centerPx,
+            CenterPy          = centerPy,
+            MapCenter         = new double3(centerLon, centerLat, 600f),
+            FireData          = fireData,
+            MaxTick           = maxTick
         };
 
+        Debug.Log($"[FireSimLoader] Parsed OK — ticks: {maxTick}, cells: {fireData.Count}");
         OnDataLoaded?.Invoke(config);
     }
 }
