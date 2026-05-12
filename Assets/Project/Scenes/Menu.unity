@@ -7364,6 +7364,11 @@ MonoBehaviour:
   continueButton: {fileID: 1008336958}
   confirmationDialog: {fileID: 854764841}
   scrollRect: {fileID: 105407641}
+  preloadedScenarioNames:
+  - Casuale.txt
+  - Left.txt
+  - Right.txt
+  - Top.txt
   entryDuration: 0.3
   entryStagger: 0.04
   colorLerpSpeed: 8
@@ -7571,7 +7576,6 @@ MonoBehaviour:
   animatePage: 1
   uploadPanelBtn: {fileID: 292401740}
   uploadAnotherBtn: {fileID: 206426886}
-  continueButton: {fileID: 1464564318}
   postUploadButtons: {fileID: 2110319508}
   labelText: {fileID: 476898527}
   fileNameText: {fileID: 1429340349}

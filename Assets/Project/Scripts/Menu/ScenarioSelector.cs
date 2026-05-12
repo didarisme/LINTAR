@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 using TMPro;
 using UnityEngine.SceneManagement;
 
@@ -16,23 +16,25 @@ public class ScenarioSelector : Pageable
     [SerializeField] private ConfirmationDialog confirmationDialog;
     [SerializeField] private ScrollRect scrollRect;
 
-    [Header("Colors")]
-    private Color normalColor = new Color(0.12f, 0.12f, 0.16f);
+    [SerializeField] private string[] preloadedScenarioNames;
+
+    private Color normalColor   = new Color(0.12f, 0.12f, 0.16f);
     private Color selectedColor = new Color(0.25f, 0.35f, 0.7f);
 
-    [Header("Animation")]
-    [SerializeField] private float entryDuration = 0.3f;
-    [SerializeField] private float entryStagger = 0.04f;
+    [SerializeField] private float entryDuration  = 0.3f;
+    [SerializeField] private float entryStagger   = 0.04f;
     [SerializeField] private float colorLerpSpeed = 8f;
-    [SerializeField] private float exitDuration = 0.2f;
+    [SerializeField] private float exitDuration   = 0.2f;
 
-    private string _selectedScenarioName;
+    private string     _selectedScenarioName;
     private GameObject _selectedButton;
 
-    private readonly Dictionary<string, GameObject> _buttons = new Dictionary<string, GameObject>();
-    private readonly List<Coroutine> _activeAnimations = new List<Coroutine>();
+    private readonly Dictionary<string, GameObject> _buttons          = new();
+    private readonly List<Coroutine>                _activeAnimations = new();
 
-    private bool animateEntry = true;
+    private bool animateEntry   = true;
+    private bool preloadDone    = false;
+
 
     protected override void Awake()
     {
@@ -40,15 +42,12 @@ public class ScenarioSelector : Pageable
         continueButton.interactable = false;
         continueButton.onClick.AddListener(OnContinuePressed);
 
-#if !UNITY_WEBGL || UNITY_EDITOR
-        SyncDesktopFilesToMemory();
-#endif
+        StartCoroutine(PreloadStreamingAssets());
     }
 
     protected override void OnOpen()
     {
-        LoadSimulations();
-        AnimateAllButtons();
+        StartCoroutine(WaitForPreloadThenLoad());
     }
 
     protected override void OnClose()
@@ -59,13 +58,56 @@ public class ScenarioSelector : Pageable
         SetAllButtonsAlpha(0f);
     }
 
-    // =========================
-    // ANIMATION CONTROL
-    // =========================
+
+    private IEnumerator PreloadStreamingAssets()
+    {
+        if (preloadedScenarioNames == null || preloadedScenarioNames.Length == 0)
+        {
+            preloadDone = true;
+            yield break;
+        }
+
+        foreach (string fileName in preloadedScenarioNames)
+        {
+            if (SimulationMemoryManager.Instance.GetSimulationContent(fileName) != null)
+                continue;
+
+            // StreamingAssets на WebGL — это URL вида:
+            // http://localhost:8080/StreamingAssets/FireScenarios/filename.txt
+            string url = System.IO.Path.Combine(
+                Application.streamingAssetsPath, "FireScenarios", fileName);
+
+            using UnityWebRequest req = UnityWebRequest.Get(url);
+            yield return req.SendWebRequest();
+
+            if (req.result == UnityWebRequest.Result.Success)
+            {
+                SimulationMemoryManager.Instance.StoreSimulation(fileName, req.downloadHandler.text);
+                Debug.Log($"[ScenarioSelector] Preloaded: {fileName}");
+            }
+            else
+            {
+                Debug.LogWarning($"[ScenarioSelector] Failed to preload '{fileName}': {req.error}");
+            }
+        }
+
+        preloadDone = true;
+    }
+
+
+    private IEnumerator WaitForPreloadThenLoad()
+    {
+        while (!preloadDone)
+            yield return null;
+
+        LoadSimulations();
+        AnimateAllButtons();
+    }
+
+
     private void RunAnimation(IEnumerator routine)
     {
-        Coroutine c = StartCoroutine(routine);
-        _activeAnimations.Add(c);
+        _activeAnimations.Add(StartCoroutine(routine));
     }
 
     private void StopAllAnimations()
@@ -75,17 +117,14 @@ public class ScenarioSelector : Pageable
         _activeAnimations.Clear();
     }
 
-    // =========================
-    // ANIMATION CORE
-    // =========================
+
     private IEnumerator AnimateFloat(System.Action<float> setter, float from, float to, float duration)
     {
         float elapsed = 0f;
         while (elapsed < duration)
         {
             elapsed += Time.deltaTime;
-            float t = Mathf.Clamp01(elapsed / duration);
-            setter(Mathf.Lerp(from, to, t));
+            setter(Mathf.Lerp(from, to, Mathf.Clamp01(elapsed / duration)));
             yield return null;
         }
         setter(to);
@@ -106,28 +145,23 @@ public class ScenarioSelector : Pageable
     private IEnumerator AnimateColor(Image img, Color target)
     {
         Color start = img.color;
-        yield return AnimateFloat(t =>
-        {
-            img.color = Color.Lerp(start, target, t);
-        }, 0f, 1f, 1f / colorLerpSpeed);
+        yield return AnimateFloat(t => img.color = Color.Lerp(start, target, t), 0f, 1f, 1f / colorLerpSpeed);
     }
 
     private IEnumerator AnimateEntry(GameObject btn, int index)
-{
-    if (!btn.TryGetComponent(out CanvasGroup cg))
-        cg = btn.AddComponent<CanvasGroup>();
+    {
+        if (!btn.TryGetComponent(out CanvasGroup cg))
+            cg = btn.AddComponent<CanvasGroup>();
 
-    RectTransform rect = btn.GetComponent<RectTransform>();
+        RectTransform rect = btn.GetComponent<RectTransform>();
+        cg.alpha        = 0f;
+        rect.localScale = Vector3.one * 0.85f;
 
-    cg.alpha = 0f;
-    rect.localScale = Vector3.one * 0.85f;
+        yield return new WaitForSeconds(index * entryStagger);
 
-    yield return new WaitForSeconds(index * entryStagger);
-
-    RunAnimation(AnimateAlpha(cg, 0f, 1f, entryDuration));
-    yield return AnimateScale(rect, Vector3.one * 0.85f, Vector3.one, entryDuration);
-}
-
+        RunAnimation(AnimateAlpha(cg, 0f, 1f, entryDuration));
+        yield return AnimateScale(rect, Vector3.one * 0.85f, Vector3.one, entryDuration);
+    }
 
     private IEnumerator AnimateExit(string fileName, GameObject btn)
     {
@@ -143,57 +177,20 @@ public class ScenarioSelector : Pageable
         _buttons.Remove(fileName);
     }
 
-
-
     private void AnimateAllButtons()
     {
         if (!animateEntry) return;
 
         int index = 0;
         foreach (Transform child in contentParent)
-        {
             RunAnimation(AnimateEntry(child.gameObject, index++));
-        }
 
         animateEntry = false;
     }
 
-
-
-    // =========================
-    // SYNC & LOAD
-    // =========================
-#if !UNITY_WEBGL || UNITY_EDITOR
-    private void SyncDesktopFilesToMemory()
-    {
-        string streamingPath = Path.Combine(Application.streamingAssetsPath, "FireScenarios");
-        if (Directory.Exists(streamingPath))
-        {
-            foreach (string path in Directory.GetFiles(streamingPath, "*.txt"))
-            {
-                string fileName = Path.GetFileName(path);
-                if (SimulationMemoryManager.Instance.GetSimulationContent(fileName) == null)
-                    SimulationMemoryManager.Instance.StoreSimulation(fileName, File.ReadAllText(path));
-            }
-        }
-
-        string persistentPath = Application.persistentDataPath;
-        if (Directory.Exists(persistentPath))
-        {
-            foreach (string path in Directory.GetFiles(persistentPath, "*.txt"))
-            {
-                string fileName = Path.GetFileName(path);
-                if (SimulationMemoryManager.Instance.GetSimulationContent(fileName) == null)
-                    SimulationMemoryManager.Instance.StoreSimulation(fileName, File.ReadAllText(path));
-            }
-        }
-    }
-#endif
-
     private void LoadSimulations()
     {
-        IEnumerable<string> memoryFiles = SimulationMemoryManager.Instance.GetAllSimulationNames();
-        HashSet<string> currentFiles = new HashSet<string>(memoryFiles);
+        HashSet<string> currentFiles = new(SimulationMemoryManager.Instance.GetAllSimulationNames());
 
         foreach (string fileName in currentFiles)
             if (!_buttons.ContainsKey(fileName))
@@ -207,13 +204,10 @@ public class ScenarioSelector : Pageable
                 toRemove.Add(kvp.Key);
             }
 
-        foreach (var key in toRemove) _buttons.Remove(key);
+        foreach (var key in toRemove)
+            _buttons.Remove(key);
     }
 
-
-    // =========================
-    // BUTTON SETUP
-    // =========================
     private void CreateButton(string fileName)
     {
         GameObject btn = Instantiate(simButtonPrefab, contentParent);
@@ -230,16 +224,14 @@ public class ScenarioSelector : Pageable
         _buttons[fileName] = btn;
     }
 
-    // =========================
-    // SELECTION & DELETE
-    // =========================
+
     private void SelectSimulation(string fileName, GameObject btn)
     {
         if (_selectedButton != null)
             RunAnimation(AnimateColor(_selectedButton.GetComponent<Image>(), normalColor));
 
         _selectedScenarioName = fileName;
-        _selectedButton = btn;
+        _selectedButton       = btn;
 
         RunAnimation(AnimateColor(btn.GetComponent<Image>(), selectedColor));
         continueButton.interactable = true;
@@ -247,27 +239,21 @@ public class ScenarioSelector : Pageable
 
     private void DeleteSimulation(string fileName, GameObject btn)
     {
-    SimulationMemoryManager.Instance.RemoveSimulation(fileName);
+        SimulationMemoryManager.Instance.RemoveSimulation(fileName);
 
-    #if !UNITY_WEBGL || UNITY_EDITOR
-        string filePath = Path.Combine(Application.persistentDataPath, fileName);
-        if (File.Exists(filePath)) File.Delete(filePath);
-    #endif
+        if (_selectedScenarioName == fileName)
+            ResetSelection();
 
-    if (_selectedScenarioName == fileName)
-        ResetSelection();
-
-    RunAnimation(AnimateExit(fileName, btn));
+        RunAnimation(AnimateExit(fileName, btn));
     }
-
 
     private void ResetSelection()
     {
         if (_selectedButton != null)
             _selectedButton.GetComponent<Image>().color = normalColor;
 
-        _selectedScenarioName = null;
-        _selectedButton = null;
+        _selectedScenarioName       = null;
+        _selectedButton             = null;
         continueButton.interactable = false;
     }
 
@@ -277,28 +263,18 @@ public class ScenarioSelector : Pageable
         scrollRect.velocity = Vector2.zero;
     }
 
-    // =========================
-    // UI HELPERS
-    // =========================
     private void SetAllButtonsAlpha(float alpha)
     {
         foreach (Transform child in contentParent)
         {
             if (!child.TryGetComponent(out CanvasGroup cg))
-            {
                 cg = child.gameObject.AddComponent<CanvasGroup>();
-            }
-
             cg.alpha = alpha;
         }
-    animateEntry = true;
 
+        animateEntry = true;
     }
 
-
-    // =========================
-    // CONTINUE
-    // =========================
     private void OnContinuePressed()
     {
         if (_selectedScenarioName == null) return;
