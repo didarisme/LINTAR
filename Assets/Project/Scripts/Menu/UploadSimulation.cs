@@ -2,7 +2,6 @@ using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
-using SFB;
 
 public class UploadSimulation : Pageable
 {
@@ -31,14 +30,13 @@ public class UploadSimulation : Pageable
     protected override void Awake()
     {
         base.Awake();
-        
+
         Initialize();
         ResetUI();
     }
 
     protected override void OnOpen()
     {
-        // page open
     }
 
     protected override void OnClose()
@@ -51,7 +49,8 @@ public class UploadSimulation : Pageable
     {
         if (_initialized) return;
 
-        _targetFolder = Path.Combine(Application.streamingAssetsPath, "FireScenarios");
+        // Android writable folder
+        _targetFolder = Path.Combine(Application.persistentDataPath, "FireScenarios");
 
         if (!Directory.Exists(_targetFolder))
             Directory.CreateDirectory(_targetFolder);
@@ -61,13 +60,30 @@ public class UploadSimulation : Pageable
         uploadAnotherBtn.onClick.AddListener(OnUploadAnother);
         btnGoToSims.onClick.AddListener(OnGoToSims);
 
+        RequestStoragePermission();
+
         _initialized = true;
+    }
+
+    private void RequestStoragePermission()
+    {
+#if UNITY_ANDROID && !UNITY_EDITOR
+
+        if (!UnityEngine.Android.Permission.HasUserAuthorizedPermission(
+                UnityEngine.Android.Permission.ExternalStorageRead))
+        {
+            UnityEngine.Android.Permission.RequestUserPermission(
+                UnityEngine.Android.Permission.ExternalStorageRead);
+        }
+
+#endif
     }
 
     private void ResetUI()
     {
         continueButton.gameObject.SetActive(true);
         continueButton.interactable = false;
+
         postUploadButtons.SetActive(false);
 
         SetDefault();
@@ -75,53 +91,91 @@ public class UploadSimulation : Pageable
 
     private void OpenFileDialog()
     {
-        var extensions = new[] { new ExtensionFilter("Text Files", "txt") };
+#if UNITY_ANDROID && !UNITY_EDITOR
 
-        string[] paths = StandaloneFileBrowser.OpenFilePanel(
-            "Select Simulation Files", "", extensions, true);
+        NativeFilePicker.PickMultipleFiles((paths) =>
+        {
+            if (paths == null || paths.Length == 0)
+                return;
 
-        if (paths == null || paths.Length == 0) return;
+            _pendingFilePaths = paths;
 
-        string label = paths.Length == 1
-            ? Path.GetFileName(paths[0])
-            : $"{paths.Length} files selected";
+            string label = paths.Length == 1
+                ? Path.GetFileName(paths[0])
+                : $"{paths.Length} files selected";
 
-        SetStatus("Selected:", label, selectedColor);
+            SetStatus("Selected:", label, selectedColor);
 
-        _pendingFilePaths = paths;
-        continueButton.interactable = true;
+            continueButton.interactable = true;
+
+        }, new string[] { "text/plain" });
+
+#endif
     }
 
     private void OnContinuePressed()
     {
-        if (_pendingFilePaths == null || _pendingFilePaths.Length == 0) return;
+        if (_pendingFilePaths == null || _pendingFilePaths.Length == 0)
+            return;
 
         int uploaded = 0;
         int skipped = 0;
 
-        foreach (string path in _pendingFilePaths)
+        foreach (string sourcePath in _pendingFilePaths)
         {
-            string fileName = Path.GetFileName(path);
-            string destPath = Path.Combine(_targetFolder, fileName);
-
-            if (File.Exists(destPath))
+            try
             {
-                skipped++;
-                continue;
-            }
+                if (string.IsNullOrEmpty(sourcePath))
+                    continue;
 
-            File.Copy(path, destPath);
-            uploaded++;
+                string fileName = Path.GetFileName(sourcePath);
+                string destinationPath = Path.Combine(_targetFolder, fileName);
+
+                // skip duplicates
+                if (File.Exists(destinationPath))
+                {
+                    skipped++;
+                    continue;
+                }
+
+                File.Copy(sourcePath, destinationPath);
+
+                uploaded++;
+
+                Debug.Log($"Copied: {destinationPath}");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"Copy failed: {e.Message}");
+            }
         }
 
         _pendingFilePaths = null;
 
-        if (skipped > 0 && uploaded == 0)
-            SetStatus("All files already exist:", $"{skipped} skipped", warningColor);
+        if (uploaded == 0 && skipped > 0)
+        {
+            SetStatus(
+                "All files already exist:",
+                $"{skipped} skipped",
+                warningColor
+            );
+        }
         else if (skipped > 0)
-            SetStatus("Uploaded:", $"{uploaded} files ({skipped} skipped)", successColor);
+        {
+            SetStatus(
+                "Uploaded:",
+                $"{uploaded} files ({skipped} skipped)",
+                successColor
+            );
+        }
         else
-            SetStatus("Uploaded:", $"{uploaded} file(s)", successColor);
+        {
+            SetStatus(
+                "Uploaded:",
+                $"{uploaded} file(s)",
+                successColor
+            );
+        }
 
         continueButton.gameObject.SetActive(false);
         postUploadButtons.SetActive(true);
@@ -134,7 +188,6 @@ public class UploadSimulation : Pageable
 
     private void OnGoToSims()
     {
-
         Debug.Log("Go to simulations page");
     }
 

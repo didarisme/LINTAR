@@ -40,8 +40,8 @@ public class ScenarioSelector : Pageable
     {
         base.Awake();
 
-        _folderPath = Path.Combine(Application.streamingAssetsPath, "FireScenarios");
-
+        _folderPath = Path.Combine(Application.persistentDataPath, "FireScenarios");
+        
         continueButton.interactable = false;
         continueButton.onClick.AddListener(OnContinuePressed);
     }
