@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c7703fec82729c4eb67fafba2fdf5c6, type: 3}
   m_Name: Fire Scenario Selection SO
   m_EditorClassIdentifier: 
-  SelectedScenario: {fileID: 4900000, guid: dd7c0849beb17114dba9c340a514dab9, type: 3}
+  SelectedScenarioPath: Assets/StreamingAssets/FireScenarios/Casuale.txt
