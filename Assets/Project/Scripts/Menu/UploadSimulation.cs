@@ -20,6 +20,8 @@ public class UploadSimulation : Pageable
     [DllImport("__Internal")]
     private static extern void TriggerBrowserFileUpload(string objectName, string methodName);
 
+    private int _uploadedCount = 0;
+    private int _skippedCount  = 0;
 
     protected override void Awake()
     {
@@ -38,14 +40,13 @@ public class UploadSimulation : Pageable
         TriggerBrowserFileUpload(gameObject.name, nameof(OnFileReceivedFromBrowser));
     }
 
-
     public void OnFileReceivedFromBrowser(string payload)
     {
         string[] parts = payload.Split(new[] { "|::|" }, 2, StringSplitOptions.None);
 
         if (parts.Length != 2)
         {
-            SetStatus("Error:", "Failed to parse file from browser", warningColor);
+            SetStatus("Error:", "Failed to parse file", warningColor);
             return;
         }
 
@@ -54,21 +55,34 @@ public class UploadSimulation : Pageable
 
         if (SimulationMemoryManager.Instance.GetSimulationContent(fileName) != null)
         {
-            SetStatus("Already exists:", fileName, warningColor);
-            postUploadButtons.SetActive(true);
-            return;
+            _skippedCount++;
+        }
+        else
+        {
+            SimulationMemoryManager.Instance.StoreSimulation(fileName, fileContent);
+            _uploadedCount++;
         }
 
-        SimulationMemoryManager.Instance.StoreSimulation(fileName, fileContent);
-        SetStatus("Uploaded:", fileName, successColor);
+        UpdateStatusLabel();
         postUploadButtons.SetActive(true);
+    }
+
+    private void UpdateStatusLabel()
+    {
+        if (_skippedCount > 0 && _uploadedCount == 0)
+            SetStatus("Already exists:", $"{_skippedCount} skipped", warningColor);
+        else if (_skippedCount > 0)
+            SetStatus("Uploaded:", $"{_uploadedCount} files ({_skippedCount} skipped)", successColor);
+        else
+            SetStatus("Uploaded:", $"{_uploadedCount} file(s)", successColor);
     }
 
     private void OnUploadAnother() => ResetUI();
 
-
     private void ResetUI()
     {
+        _uploadedCount = 0;
+        _skippedCount  = 0;
         postUploadButtons.SetActive(false);
         SetDefault();
     }

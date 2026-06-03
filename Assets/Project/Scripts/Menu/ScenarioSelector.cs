@@ -16,11 +16,15 @@ public class ScenarioSelector : Pageable
     [SerializeField] private ConfirmationDialog confirmationDialog;
     [SerializeField] private ScrollRect scrollRect;
 
+    [Header("Preloaded Scenarios")]
+    [Tooltip("Имена файлов из папки StreamingAssets/FireScenarios которые загружаются автоматически")]
     [SerializeField] private string[] preloadedScenarioNames;
 
+    [Header("Colors")]
     private Color normalColor   = new Color(0.12f, 0.12f, 0.16f);
-    private Color selectedColor = new Color(0.25f, 0.35f, 0.7f);
+    private Color selectedColor = new Color(0.8f, 0.4f, 0.1f);
 
+    [Header("Animation")]
     [SerializeField] private float entryDuration  = 0.3f;
     [SerializeField] private float entryStagger   = 0.04f;
     [SerializeField] private float colorLerpSpeed = 8f;
@@ -69,11 +73,10 @@ public class ScenarioSelector : Pageable
 
         foreach (string fileName in preloadedScenarioNames)
         {
+
             if (SimulationMemoryManager.Instance.GetSimulationContent(fileName) != null)
                 continue;
 
-            // StreamingAssets на WebGL — это URL вида:
-            // http://localhost:8080/StreamingAssets/FireScenarios/filename.txt
             string url = System.IO.Path.Combine(
                 Application.streamingAssetsPath, "FireScenarios", fileName);
 
@@ -188,6 +191,7 @@ public class ScenarioSelector : Pageable
         animateEntry = false;
     }
 
+
     private void LoadSimulations()
     {
         HashSet<string> currentFiles = new(SimulationMemoryManager.Instance.GetAllSimulationNames());
@@ -207,6 +211,7 @@ public class ScenarioSelector : Pageable
         foreach (var key in toRemove)
             _buttons.Remove(key);
     }
+
 
     private void CreateButton(string fileName)
     {

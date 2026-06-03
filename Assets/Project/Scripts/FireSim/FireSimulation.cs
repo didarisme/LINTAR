@@ -2,43 +2,62 @@ using System.Collections;
 using System.Collections.Generic;
 using CesiumForUnity;
 using UnityEngine;
+using UnityEngine.VFX;
 
 public class FireSimulation : MonoBehaviour
 {
-    [SerializeField] private FireSimLoader     loader;
+    [Header("References")]
+    [SerializeField] private FireSimLoader loader;
+    [SerializeField] private VisualEffect fireVFX;
     [SerializeField] private CesiumGlobeAnchor fireAnchorObject;
 
-    [SerializeField] private Mesh     fireMesh;
-    [SerializeField] private Material fireMaterial;
-    [SerializeField] private float    fireMeshScale = 5f;
-
-    [SerializeField] private float fireSpeed     = 1f;
-    [SerializeField] private int   fireLifetime  = 20;
+    [Header("Simulation")]
+    [SerializeField] private float fireSpeed = 1f;
+    [SerializeField] private int fireLifetime = 20;
     [SerializeField] private float raycastHeight = 500f;
-    [SerializeField] private float yOffset       = 1f;
+    [SerializeField] private float yOffset = 1f;
 
-    private FireSimConfig       config;
-    private float               tickDuration = 0.05f;
-    private HashSet<Vector2Int> burntSet     = new();
-    private int  currentTick;
-    private bool started = false;
+    [Header("VFX")]
+    [SerializeField] private string spawnEventName = "UpdateFire";
 
-    private const int            BatchSize = 1023;
-    private readonly List<Matrix4x4> _batch = new(BatchSize);
+    private FireSimConfig config;
+
+    private GraphicsBuffer positionBuffer;
+    private GraphicsBuffer fireDataBuffer;
+    private int maxFires = 10000;
+    private float tickDuration = 0.05f;
+
+    private HashSet<Vector2Int> burntSet = new();
+    private List<FireInstance> pendingVfxSpawns = new();
 
     public List<FireInstance> FireInstances { get; private set; } = new();
 
+    private int currentTick;
+    private bool started = false;
+
     public float FireSpeed => fireSpeed;
-    public float YOffset   => yOffset;
-    public int   Lifetime  => fireLifetime;
+    public float YOffset => yOffset;
+    public int Lifetime => fireLifetime;
 
     private void OnEnable()
     {
         if (loader == null)
         {
-            Debug.LogError("[FireSimulation] FireSimLoader reference missing!");
+            Debug.LogError("FireSimLoader reference missing!");
             return;
         }
+
+        positionBuffer = new GraphicsBuffer(
+            GraphicsBuffer.Target.Structured,
+            maxFires,
+            sizeof(float) * 3
+        );
+
+        fireDataBuffer = new GraphicsBuffer(
+            GraphicsBuffer.Target.Structured,
+            maxFires,
+            sizeof(float)
+        );
 
         loader.OnDataLoaded += OnConfigLoaded;
     }
@@ -47,12 +66,9 @@ public class FireSimulation : MonoBehaviour
     {
         if (loader != null)
             loader.OnDataLoaded -= OnConfigLoaded;
-    }
 
-    private void Update()
-    {
-        if (started)
-            RenderFire();
+        positionBuffer?.Release();
+        fireDataBuffer?.Release();
     }
 
     private void OnConfigLoaded(FireSimConfig newConfig)
@@ -64,32 +80,36 @@ public class FireSimulation : MonoBehaviour
 
     private void UpdateTickDuration()
     {
-        tickDuration = config.PatchWidthMeters / fireSpeed;
+        float patchSize = config.PatchWidthMeters;
+        tickDuration = patchSize / fireSpeed;
     }
 
     public void StartSimulation()
     {
-        if (started) return;
-        started = true;
-        StartCoroutine(PlayFire());
+        if (started != true)
+        {
+            StartCoroutine(PlayFire());
+            started = true;
+        }
     }
 
-    public float SetSpeed(float value)
+    public float SetSpeed(float speedValue)
     {
-        fireSpeed = Mathf.Clamp(value, 1f, 30f);
+        fireSpeed = Mathf.Clamp(speedValue, 1f, 30f);
         UpdateTickDuration();
         return fireSpeed;
     }
 
-    public float SetLifetime(float value)
+    public float SetLifetime(float lifetimeValue)
     {
-        fireLifetime = (int)Mathf.Clamp(value, 1f, 50f);
-        return fireLifetime;
+        int lifetime = (int)Mathf.Clamp(lifetimeValue, 1f, 50f);
+        fireLifetime = lifetime;
+        return lifetime;
     }
 
-    public float SetYOffset(float value)
+    public float SetYOffset(float offsetValue)
     {
-        yOffset = value;
+        yOffset = offsetValue;
         return yOffset;
     }
 
@@ -97,9 +117,19 @@ public class FireSimulation : MonoBehaviour
     {
         for (currentTick = 0; currentTick <= config.MaxTick; currentTick++)
         {
+            bool spawned = false;
+
             if (config.FireData.TryGetValue(currentTick, out var positions))
+            {
                 foreach (var pos in positions)
+                {
                     SpawnFire(pos.x, pos.y);
+                    spawned = true;
+                }
+            }
+
+            if (spawned)
+                FlushVFXSpawns();
 
             float timer = 0f;
             while (timer < tickDuration)
@@ -109,19 +139,26 @@ public class FireSimulation : MonoBehaviour
             }
         }
 
-        Debug.Log("[FireSimulation] Simulation finished.");
+        Debug.Log("Simulation finished");
     }
 
     private void SpawnFire(int px, int py)
     {
         Vector2Int key = new(px, py);
-        if (!burntSet.Add(key)) return;
 
-        FireInstances.Add(new FireInstance
+        if (!burntSet.Add(key))
+            return;
+
+        Vector3 groundPos = GetGroundPosition(px, py);
+
+        var fire = new FireInstance
         {
             startTick = currentTick,
-            position  = GetGroundPosition(px, py)
-        });
+            position = groundPos
+        };
+
+        FireInstances.Add(fire);
+        pendingVfxSpawns.Add(fire);
     }
 
     private Vector3 GetGroundPosition(int px, int py)
@@ -130,47 +167,47 @@ public class FireSimulation : MonoBehaviour
         float localZ = (py - config.CenterPy) * config.PatchHeightMeters;
 
         Vector3 worldPos = fireAnchorObject.transform.TransformPoint(
-            new Vector3(localX, raycastHeight, localZ));
+            new Vector3(localX, raycastHeight, localZ)
+        );
 
-        if (Physics.Raycast(worldPos, Vector3.down, out RaycastHit hit, raycastHeight * 2f))
+        if (Physics.Raycast(worldPos, Vector3.down, out RaycastHit hit, raycastHeight * 2))
+        {
             return hit.point + Vector3.up * yOffset;
+        }
 
-        return new Vector3(worldPos.x, fireAnchorObject.transform.position.y + yOffset, worldPos.z);
+        return worldPos + Vector3.up * yOffset;
     }
 
-    private void RenderFire()
+    private void FlushVFXSpawns()
     {
-        if (fireMesh == null || fireMaterial == null)
-        {
-            Debug.LogWarning("[FireSimulation] fireMesh or fireMaterial not assigned!");
+        int count = pendingVfxSpawns.Count;
+
+        if (count == 0)
             return;
-        }
 
-        if (FireInstances.Count == 0) return;
+        Vector3[] positions = new Vector3[count];
+        float[] lifetimes = new float[count];
 
-        _batch.Clear();
-
-        for (int i = 0; i < FireInstances.Count; i++)
+        for (int i = 0; i < count; i++)
         {
-            _batch.Add(Matrix4x4.TRS(
-                FireInstances[i].position,
-                Quaternion.identity,
-                Vector3.one * fireMeshScale));
-
-            if (_batch.Count == BatchSize)
-            {
-                Graphics.DrawMeshInstanced(fireMesh, 0, fireMaterial, _batch);
-                _batch.Clear();
-            }
+            positions[i] = pendingVfxSpawns[i].position;
+            lifetimes[i] = fireLifetime;
         }
 
-        if (_batch.Count > 0)
-            Graphics.DrawMeshInstanced(fireMesh, 0, fireMaterial, _batch);
+        positionBuffer.SetData(positions, 0, 0, count);
+        fireDataBuffer.SetData(lifetimes, 0, 0, count);
+
+        fireVFX.SetGraphicsBuffer("PositionBuffer", positionBuffer);
+        fireVFX.SetGraphicsBuffer("FireDataBuffer", fireDataBuffer);
+        fireVFX.SetUInt("SpawnCount", (uint)count);
+        fireVFX.SendEvent(spawnEventName);
+
+        pendingVfxSpawns.Clear();
     }
 
     public class FireInstance
     {
-        public int     startTick;
+        public int startTick;
         public Vector3 position;
     }
 }
