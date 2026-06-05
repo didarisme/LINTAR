@@ -9,7 +9,6 @@ public class UploadSimulation : Pageable
     [SerializeField] private Button uploadPanelBtn;
     [SerializeField] private Button uploadAnotherBtn;
     [SerializeField] private Button continueButton;
-    [SerializeField] private Button btnGoToSims;
 
     [Space]
     [SerializeField] private GameObject postUploadButtons;
@@ -58,7 +57,6 @@ public class UploadSimulation : Pageable
         uploadPanelBtn.onClick.AddListener(OpenFileDialog);
         continueButton.onClick.AddListener(OnContinuePressed);
         uploadAnotherBtn.onClick.AddListener(OnUploadAnother);
-        btnGoToSims.onClick.AddListener(OnGoToSims);
 
         RequestStoragePermission();
 

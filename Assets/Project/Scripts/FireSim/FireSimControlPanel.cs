@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -20,26 +21,27 @@ public class FireSimControlPanel : MonoBehaviour
     [SerializeField] private TMP_InputField burntSizeField;
     [SerializeField] private TMP_InputField burntOffsetField;
 
-    private bool visible = true;
+    [Space]
+    [SerializeField] private PopUpWindow keyboardPanel;
+
+    private TMP_InputField currentInputField;
+    private Dictionary<TMP_InputField, System.Action<string>> fieldActions;
 
     private void Start()
     {
+        SubscribeOnInputFieldActions();
+
         launchBtn.onClick.AddListener(OnLaunchButton);
         reloadBtn.onClick.AddListener(OnReloadButton);
         exitBtn.onClick.AddListener(OnExitButton);
 
-        speedField.onSubmit.AddListener(SetSpeed);
-        lifetimeField.onSubmit.AddListener(SetLifeTime);
-        offsetField.onSubmit.AddListener(SetOffset);
+        UpdatePlaceHolder(speedField.placeholder as TMP_Text, fireSim.FireSpeed.ToString("F2") + " m/s");
+        UpdatePlaceHolder(lifetimeField.placeholder as TMP_Text, fireSim.Lifetime.ToString("F0") + " s");
+        UpdatePlaceHolder(offsetField.placeholder as TMP_Text, fireSim.YOffset.ToString("F2") + " m");
+        UpdatePlaceHolder(burntSizeField.placeholder as TMP_Text, burntRenderer.MeshSize.ToString("F2") + " m");
+        UpdatePlaceHolder(burntOffsetField.placeholder as TMP_Text, burntRenderer.YOffset.ToString("F2") + " m");
 
-        burntSizeField.onSubmit.AddListener(SetBurntSize);
-        burntOffsetField.onSubmit.AddListener(SetBurntOffset);
-
-        UpdatePlaceHolder(speedField.placeholder as TMP_Text, fireSim.FireSpeed.ToString("F1") + " m/s");
-        UpdatePlaceHolder(lifetimeField.placeholder as TMP_Text, fireSim.Lifetime.ToString("F1") + " s");
-        UpdatePlaceHolder(offsetField.placeholder as TMP_Text, fireSim.YOffset.ToString("F1") + " m");
-        UpdatePlaceHolder(burntSizeField.placeholder as TMP_Text, burntRenderer.MeshSize.ToString("F1") + " m");
-        UpdatePlaceHolder(burntOffsetField.placeholder as TMP_Text, burntRenderer.YOffset.ToString("F1") + " m");
+        keyboardPanel.Hide();
     }
 
     private void SetSpeed(string textValue)
@@ -47,7 +49,7 @@ public class FireSimControlPanel : MonoBehaviour
         if (float.TryParse(textValue, out float speed))
         {
             speed = fireSim.SetSpeed(speed);
-            UpdatePlaceHolder(speedField.placeholder as TMP_Text, speed.ToString("F1") + " m/s" );
+            UpdatePlaceHolder(speedField.placeholder as TMP_Text, speed.ToString("F1") + " m/s");
 
             speedField.text = "";
         }
@@ -58,7 +60,7 @@ public class FireSimControlPanel : MonoBehaviour
         if (float.TryParse(textValue, out float lifeTime))
         {
             lifeTime = fireSim.SetLifetime(lifeTime);
-            UpdatePlaceHolder(lifetimeField.placeholder as TMP_Text, lifeTime.ToString("F1") + " s");
+            UpdatePlaceHolder(lifetimeField.placeholder as TMP_Text, lifeTime.ToString("F0") + " s");
 
             lifetimeField.text = "";
         }
@@ -69,7 +71,7 @@ public class FireSimControlPanel : MonoBehaviour
         if (float.TryParse(textValue, out float offset))
         {
             offset = fireSim.SetYOffset(offset);
-            UpdatePlaceHolder(offsetField.placeholder as TMP_Text, offset.ToString("F1") + " m");
+            UpdatePlaceHolder(offsetField.placeholder as TMP_Text, offset.ToString("F2") + " m");
 
             offsetField.text = "";
         }
@@ -122,5 +124,67 @@ public class FireSimControlPanel : MonoBehaviour
         exitBtn.interactable = false;
 
         SceneManager.LoadScene(0);
+    }
+
+    private void SelectField(TMP_InputField field)
+    {
+        currentInputField = field;
+        keyboardPanel.Show();
+    }
+
+    public void KeyBoardValue(string value)
+    {
+        if (currentInputField == null)
+            return;
+
+        currentInputField.text += value;
+    }
+
+    public void Backspace()
+    {
+        if (currentInputField == null)
+            return;
+
+        string text = currentInputField.text;
+
+        if (text.Length > 0)
+            currentInputField.text = text[..^1];
+    }
+
+    public void SubmitBtn()
+    {
+        if (currentInputField == null)
+            return;
+
+        fieldActions[currentInputField]?.Invoke(currentInputField.text);
+
+        currentInputField = null;
+        keyboardPanel.Hide();
+    }
+
+    private void SubscribeOnInputFieldActions()
+    {
+        speedField.onSubmit.AddListener(SetSpeed);
+        lifetimeField.onSubmit.AddListener(SetLifeTime);
+        offsetField.onSubmit.AddListener(SetOffset);
+
+        burntSizeField.onSubmit.AddListener(SetBurntSize);
+        burntOffsetField.onSubmit.AddListener(SetBurntOffset);
+
+        speedField.onSelect.AddListener(_ => SelectField(speedField));
+        lifetimeField.onSelect.AddListener(_ => SelectField(lifetimeField));
+        offsetField.onSelect.AddListener(_ => SelectField(offsetField));
+
+        burntSizeField.onSelect.AddListener(_ => SelectField(burntSizeField));
+        burntOffsetField.onSelect.AddListener(_ => SelectField(burntOffsetField));
+
+        fieldActions = new()
+        {
+            { speedField, SetSpeed },
+            { lifetimeField, SetLifeTime },
+            { offsetField, SetOffset },
+            { burntSizeField, SetBurntSize },
+            { burntOffsetField, SetBurntOffset }
+        };
     }
 }
